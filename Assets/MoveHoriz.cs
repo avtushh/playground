@@ -8,6 +8,8 @@ public class MoveHoriz : MonoBehaviour {
 
 	public Transform leftBound, rightBound;
 
+	LTDescr currentTween;
+
 	bool _paused;
 
 	public bool paused{
@@ -42,17 +44,20 @@ public class MoveHoriz : MonoBehaviour {
 
 	public void MoveRight(){
 		direction = 1;
-		LeanTween.cancel(gameObject);
+		if (currentTween != null)
+			LeanTween.cancel(currentTween.uniqueId);
 		var time = Mathf.Abs(transform.position.x - _right) / 5;
 
-		LeanTween.moveX(gameObject, _right, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveLeft);
+		currentTween = LeanTween.moveX(gameObject, _right, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveLeft);
 	}
 
 	public void MoveLeft(){
 		direction = -1;
-		LeanTween.cancel(gameObject);
+		if (currentTween != null)
+			LeanTween.cancel(currentTween.uniqueId);
 		var time = Mathf.Abs(transform.position.x - _left) / 5;
-		LeanTween.moveX(gameObject, _left, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveRight);
+
+		currentTween = LeanTween.moveX(gameObject, _left, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveRight);
 	}
 		
 	public void SwitchDirection(){

@@ -13,7 +13,7 @@ public class Throw : MonoBehaviour {
 	}
 
 	public void ThrowMe(float x, float y){
-		Debug.LogError("throw");
+		Debug.LogError("throw, velocity: " + x + "," + y);
 		_rigidBody.velocity = new Vector2(x, y);
 	}
 
