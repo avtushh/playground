@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ForceField : MonoBehaviour {
+public class DelayedDisable : MonoBehaviour {
 
 	public int forceFieldTime = 10;
 
