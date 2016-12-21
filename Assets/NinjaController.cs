@@ -27,8 +27,6 @@ public class NinjaController : MonoBehaviour {
 		
 	}
 
-
-
 	protected void ThrowStar (Vector2 normalizedSwipeDir, float throwSpeed)
 	{
 		var throwXSpeed = normalizedSwipeDir.x * throwSpeed;

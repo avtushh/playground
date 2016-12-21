@@ -8,42 +8,73 @@ public class MoveHoriz : MonoBehaviour {
 
 	public Transform leftBound, rightBound;
 
-	public bool paused;
+	bool _paused;
 
-	float maxX, minX;
-
-
-
-	void Start () {
-		minX = leftBound.position.x;
-		maxX = rightBound.position.x;
-	}
-	
-	void Update () {
-		if (paused)
-			return;
-		
-		MoveBy(speed * direction * Time.deltaTime);
-	}
-
-	public void MoveBy(float x){
-		var pos = transform.position;
-		pos.x += x;
-
-		if (pos.x >= maxX){
-			pos.x = maxX;
-			SwitchDirection();
-		}else if (pos.x <= minX){
-			pos.x = minX;
-			SwitchDirection();
+	public bool paused{
+		get{
+			return _paused;
 		}
 
-		transform.position = pos;
+		set{
+			if (_paused == value){
+				return;
+			}
+
+			_paused = value;
+
+			if (_paused)
+				LeanTween.cancel(gameObject);
+			else{
+				Move();
+			}
+
+
+		}
+
 	}
 
+	float _right, _left;
+
+	void Start () {
+		_left = leftBound.position.x;
+		_right = rightBound.position.x;
+	}
+
+	public void MoveRight(){
+		direction = 1;
+		LeanTween.cancel(gameObject);
+		var time = Mathf.Abs(transform.position.x - _right) / 5;
+
+		LeanTween.moveX(gameObject, _right, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveLeft);
+	}
+
+	public void MoveLeft(){
+		direction = -1;
+		LeanTween.cancel(gameObject);
+		var time = Mathf.Abs(transform.position.x - _left) / 5;
+		LeanTween.moveX(gameObject, _left, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveRight);
+	}
+		
 	public void SwitchDirection(){
+
+		if (_paused){
+			_paused = false;
+		}
+
 		direction *= -1;
+
+		Move ();
 	}
 
 
+	void Move ()
+	{
+		Debug.LogError("MOVE: " + direction);
+		if (direction == 1) {
+			MoveRight ();
+		}
+		else {
+			MoveLeft ();
+		}
+	}
 }

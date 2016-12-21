@@ -7,7 +7,6 @@ public class PlayerNinjaController : NinjaController{
 
 	void TouchInput_OnTap (Vector2 obj)
 	{
-		moveHoriz.paused = false;
 		moveHoriz.SwitchDirection();
 	}
 

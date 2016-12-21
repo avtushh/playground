@@ -54,13 +54,14 @@ public class NinjaInput : MonoBehaviour {
 			//OnMouseDown();
 		}
 
-		else if (Input.GetMouseButtonUp(0)){
+		else if (Input.GetMouseButtonUp(0) && isMouseDown){
 			isMouseDown = false;
 			if (!didSwipe){
 				CheckSwipe ();
 			}
 
 			if (!didSwipe){
+				Debug.LogError("on tap");
 				OnTap(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
 			}
 
