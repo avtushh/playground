@@ -4,14 +4,16 @@ using System;
 
 public class NinjaInput : MonoBehaviour {
 
-	public event Action OnMouseDown = () => {};
-	public event Action<Vector2> OnTap = v => {};
-	public event Action<Vector2, float> OnSwipe = (v,f) => {};
+	public event Action<Vector2> SwipeUpdatedEvent = (v1) => {};
+	public event Action<Vector2> TapEvent = v => {};
+	public event Action<Vector2, float> SwipeDoneEvent = (v,f) => {};
+	public event Action<Vector3> MouseUpEvent = (v) => {};
 
 	public Vector2 swipeDir;
 	public float swipeSpeed;
 
-	public float minSwipeTime = 0.3f;
+
+	public float minSwipeTime = 0.2f;
 	public float minSwipeSpeed = 10;
 
 	bool isMouseDown = false;
@@ -33,14 +35,15 @@ public class NinjaInput : MonoBehaviour {
 
 	void FireSwipeEvent(){
 		didSwipe = true;
-		OnSwipe(swipeDir, swipeSpeed);		
+		SwipeDoneEvent(swipeDir, swipeSpeed);		
 	}
 
-	void CheckSwipe ()
+	void CheckSwipe (bool allowSwipeFire = false)
 	{
-		if (downTime > minSwipeTime) {
+		if (downTime >= minSwipeTime) {
 			UpdateSwipeData ();
-			if (swipeSpeed > minSwipeSpeed) {
+
+			if (allowSwipeFire) {
 				FireSwipeEvent ();
 			}
 		}
@@ -51,25 +54,32 @@ public class NinjaInput : MonoBehaviour {
 		if (Input.GetMouseButtonDown(0)){
 			isMouseDown = true;
 			mouseDownPos = Input.mousePosition;
-			//OnMouseDown();
 		}
 
 		else if (Input.GetMouseButtonUp(0) && isMouseDown){
 			isMouseDown = false;
-			if (!didSwipe){
-				CheckSwipe ();
-			}
+			CheckSwipe (true);
 
 			if (!didSwipe){
-				Debug.LogError("on tap");
-				OnTap(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
+				if (downTime < minSwipeTime){
+					Debug.LogError("on tap");
+					TapEvent(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
+				}else{
+					MouseUpEvent(Input.mousePosition);
+				}
 			}
 
+			downTime = 0;
 			didSwipe = false;
 		}else{
-			if (isMouseDown && !didSwipe){
+			if (isMouseDown){
 				downTime += Time.deltaTime;
-				CheckSwipe();
+				if (downTime >= minSwipeTime){
+					var currPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);					
+					SwipeUpdatedEvent(currPos);
+				}
+				if (!didSwipe)
+					CheckSwipe(false);
 			}
 		}
 
