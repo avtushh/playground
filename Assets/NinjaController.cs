@@ -3,7 +3,6 @@ using System.Collections;
 
 public class NinjaController : MonoBehaviour {
 
-	public NinjaInput touchInput;
 	public MoveHoriz moveHoriz;
 
 	public GameObject ninjaStarPrefab;
@@ -12,7 +11,6 @@ public class NinjaController : MonoBehaviour {
 
 	public float throwSpeed = 10f;
 
-	// Use this for initialization
 	void Start () {
 		AddListeners();
 	}
@@ -21,29 +19,18 @@ public class NinjaController : MonoBehaviour {
 		RemoveListeners();
 	}
 
-	void AddListeners(){
-		touchInput.OnTap += TouchInput_OnTap;
-		touchInput.OnSwipe += TouchInput_OnSwipe;
-		touchInput.OnMouseDown += TouchInput_OnMouseDown;
+	protected virtual void AddListeners(){
+		
 	}
 
-	void TouchInput_OnMouseDown ()
+	protected virtual void RemoveListeners(){
+		
+	}
+
+
+
+	protected void ThrowStar (Vector2 normalizedSwipeDir, float throwSpeed)
 	{
-		moveHoriz.paused = true;
-	}
-
-	void RemoveListeners(){
-		touchInput.OnTap -= TouchInput_OnTap;
-		touchInput.OnSwipe -= TouchInput_OnSwipe;
-		touchInput.OnMouseDown -= TouchInput_OnMouseDown;
-	}
-
-	void ThrowStar (Vector2 normalizedSwipeDir)
-	{
-		if (normalizedSwipeDir.y < 0.1f) {
-			normalizedSwipeDir.y = 0.1f;
-		}
-
 		var throwXSpeed = normalizedSwipeDir.x * throwSpeed;
 		var throwYSpeed = normalizedSwipeDir.y * throwSpeed;
 
@@ -58,29 +45,14 @@ public class NinjaController : MonoBehaviour {
 		ninjaStarThrow.ThrowMe(throwXSpeed, throwYSpeed);
 	}
 
-	void TouchInput_OnSwipe (Vector2 normalizedSwipeDir, float swipeSpeed)
-	{
-		ThrowStar (normalizedSwipeDir);
 
-		LeanTween.delayedCall(0.5f, UnPauseNinja);
-	}
 
-	void UnPauseNinja(){
+	protected void UnPauseNinja(){
 		moveHoriz.paused = false;
 	}
 
-	void PauseNinja(){
+	protected void PauseNinja(){
 		moveHoriz.paused = true;
 	}
-
-	void TouchInput_OnTap (Vector2 obj)
-	{
-		moveHoriz.paused = false;
-		moveHoriz.SwitchDirection();
-	}
-
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }
+
