@@ -8,7 +8,11 @@ public class MoveHoriz : MonoBehaviour {
 
 	public Transform leftBound, rightBound;
 
+	public bool paused;
+
 	float maxX, minX;
+
+
 
 	void Start () {
 		minX = leftBound.position.x;
@@ -16,6 +20,9 @@ public class MoveHoriz : MonoBehaviour {
 	}
 	
 	void Update () {
+		if (paused)
+			return;
+		
 		MoveBy(speed * direction * Time.deltaTime);
 	}
 

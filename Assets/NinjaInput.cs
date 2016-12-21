@@ -4,6 +4,7 @@ using System;
 
 public class NinjaInput : MonoBehaviour {
 
+	public event Action OnMouseDown = () => {};
 	public event Action<Vector2> OnTap = v => {};
 	public event Action<Vector2, float> OnSwipe = (v,f) => {};
 
@@ -24,6 +25,7 @@ public class NinjaInput : MonoBehaviour {
 		if (Input.GetMouseButtonDown(0)){
 			isMouseDown = true;
 			mouseDownPos = Input.mousePosition;
+			OnMouseDown();
 		}
 
 		else if (Input.GetMouseButtonUp(0)){

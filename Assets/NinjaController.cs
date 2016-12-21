@@ -8,6 +8,10 @@ public class NinjaController : MonoBehaviour {
 
 	public GameObject ninjaStarPrefab;
 
+	public Throw ninjaStarThrow;
+
+	public float throwSpeed = 10f;
+
 	// Use this for initialization
 	void Start () {
 		AddListeners();
@@ -20,35 +24,58 @@ public class NinjaController : MonoBehaviour {
 	void AddListeners(){
 		touchInput.OnTap += TouchInput_OnTap;
 		touchInput.OnSwipe += TouchInput_OnSwipe;
+		touchInput.OnMouseDown += TouchInput_OnMouseDown;
+	}
+
+	void TouchInput_OnMouseDown ()
+	{
+		moveHoriz.paused = true;
 	}
 
 	void RemoveListeners(){
 		touchInput.OnTap -= TouchInput_OnTap;
 		touchInput.OnSwipe -= TouchInput_OnSwipe;
+		touchInput.OnMouseDown -= TouchInput_OnMouseDown;
+	}
+
+	void ThrowStar (Vector2 normalizedSwipeDir)
+	{
+		if (normalizedSwipeDir.y < 0.1f) {
+			normalizedSwipeDir.y = 0.1f;
+		}
+
+		var throwXSpeed = normalizedSwipeDir.x * throwSpeed;
+		var throwYSpeed = normalizedSwipeDir.y * throwSpeed;
+
+		if (ninjaStarThrow == null){
+			var ninjaGo = GameObject.Instantiate (ninjaStarPrefab, transform.position, Quaternion.identity) as GameObject;
+			ninjaStarThrow = ninjaGo.GetComponent<Throw> ();
+		}else{
+			ninjaStarThrow.transform.position = transform.position;
+			ninjaStarThrow.Activate();
+		}
+
+		ninjaStarThrow.ThrowMe(throwXSpeed, throwYSpeed);
 	}
 
 	void TouchInput_OnSwipe (Vector2 normalizedSwipeDir, float swipeSpeed)
 	{
-		var ninjaStar = GameObject.Instantiate(ninjaStarPrefab, transform.position, Quaternion.identity) as GameObject;
+		ThrowStar (normalizedSwipeDir);
 
-		swipeSpeed = 10;
+		LeanTween.delayedCall(0.5f, UnPauseNinja);
+	}
 
-		if (normalizedSwipeDir.y < 0.1f){
-			normalizedSwipeDir.y = 0.1f;
-		}
+	void UnPauseNinja(){
+		moveHoriz.paused = false;
+	}
 
-		var throwXSpeed = normalizedSwipeDir.x * swipeSpeed;
-		var throwYSpeed = normalizedSwipeDir.y * swipeSpeed;
-
-		var throwScr = ninjaStar.GetComponent<Throw>();
-
-		throwScr.initThrowX = throwXSpeed;
-		throwScr.initThrowY = throwYSpeed;
-
+	void PauseNinja(){
+		moveHoriz.paused = true;
 	}
 
 	void TouchInput_OnTap (Vector2 obj)
 	{
+		moveHoriz.paused = false;
 		moveHoriz.SwitchDirection();
 	}
 

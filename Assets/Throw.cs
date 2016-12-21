@@ -8,14 +8,20 @@ public class Throw : MonoBehaviour {
 	public float initThrowX = 20;
 	public float initThrowY = 2;
 
-	// Use this for initialization
-	void Start () {
+	void Awake () {
 		_rigidBody = GetComponent<Rigidbody2D>();
-
-		ThrowMe(initThrowX, initThrowY);
 	}
 
 	public void ThrowMe(float x, float y){
 		_rigidBody.velocity = new Vector2(x, y);
 	}
+
+	public void Activate(){
+		gameObject.SetActive(true);
+	}
+
+	void OnDisable(){
+		_rigidBody.velocity = Vector2.zero;
+	}
+
 }
