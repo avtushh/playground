@@ -60,3 +60,4 @@ public class PlayerNinjaController : NinjaController{
 		moveHoriz.paused = true;
 	}
 }
+

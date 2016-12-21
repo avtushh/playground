@@ -14,19 +14,18 @@ public class NinjaInput : MonoBehaviour {
 
 
 	public float minSwipeTime = 0.2f;
-	public float minSwipeSpeed = 10;
+	public float maxSwipeTime = 1f;
 
 	bool isMouseDown = false;
 	bool didSwipe = false;
-
-	Vector3 mouseDownPos;
 
 	float downTime;
 
 	void UpdateSwipeData ()
 	{
-		var mouseUpPos = Input.mousePosition;
-		var deltaPos = mouseUpPos - mouseDownPos;
+		Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+
+		var deltaPos = Input.mousePosition - screenPos;
 		swipeDir = deltaPos.normalized;
 		//Unit Vector of change in position
 		swipeSpeed = deltaPos.magnitude / downTime;
@@ -53,33 +52,38 @@ public class NinjaInput : MonoBehaviour {
 
 		if (Input.GetMouseButtonDown(0)){
 			isMouseDown = true;
-			mouseDownPos = Input.mousePosition;
 		}
 
 		else if (Input.GetMouseButtonUp(0) && isMouseDown){
 			isMouseDown = false;
-			CheckSwipe (true);
 
-			if (!didSwipe){
-				if (downTime < minSwipeTime){
-					Debug.LogError("on tap");
-					TapEvent(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
-				}else{
+			if (downTime < minSwipeTime){
+				Debug.LogError("on tap");
+				TapEvent(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
+			}else{
+				if (!didSwipe)
+					CheckSwipe (true);
+				if (!didSwipe){
 					MouseUpEvent(Input.mousePosition);
 				}
-			}
+			}	
 
 			downTime = 0;
 			didSwipe = false;
 		}else{
 			if (isMouseDown){
 				downTime += Time.deltaTime;
-				if (downTime >= minSwipeTime){
-					var currPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);					
-					SwipeUpdatedEvent(currPos);
+
+				if (!didSwipe){
+					
+					if (downTime >= minSwipeTime){
+						var currPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);					
+						SwipeUpdatedEvent(currPos);
+					}
+
+					CheckSwipe(downTime > maxSwipeTime);
 				}
-				if (!didSwipe)
-					CheckSwipe(false);
+					
 			}
 		}
 
