@@ -2,11 +2,16 @@ using UnityEngine;
 using System.Collections;
 
 public class EnemyNinjaController : NinjaController{
-
+	
 	void Start(){
-		moveHoriz.MoveRight();
-		DelayedThrow();
-		DelayedChangedPosition();
+		Init ();
+	}
+
+	void Init ()
+	{
+		moveHoriz.MoveRight ();
+		DelayedThrow ();
+		DelayedChangedPosition ();
 	}
 
 	void DelayedThrow(){
@@ -32,6 +37,18 @@ public class EnemyNinjaController : NinjaController{
 		}else{
 			LeanTween.delayedCall(gameObject, 1f, TryThrow);
 		}
+	}
+
+	public override void Pause ()
+	{
+		base.Pause ();
+		LeanTween.cancel(gameObject);
+	}
+
+	public override void Resume ()
+	{
+		base.Resume ();
+		Init ();
 	}
 
 

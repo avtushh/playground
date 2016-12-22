@@ -12,9 +12,9 @@ public class MoveHoriz : MonoBehaviour {
 
 	LTDescr currentTween;
 
-	public Transform icon;
+	public SpriteRenderer icon;
 
-	public float _orgScale;
+	public bool isInitalPosLeft = true;
 
 	bool _paused;
 
@@ -46,7 +46,6 @@ public class MoveHoriz : MonoBehaviour {
 	void Start () {
 		_left = leftBound.position.x;
 		_right = rightBound.position.x;
-		_orgScale = icon.transform.localScale.x;
 	}
 
 	public void MoveRight(){
@@ -63,31 +62,12 @@ public class MoveHoriz : MonoBehaviour {
 
 	public void TurnRight ()
 	{
-		if (_orgScale == 0){
-			_orgScale = icon.transform.localScale.x;
-		}
-
-
-		var scale = icon.transform.localScale;
-		scale.x = -_orgScale;
-		icon.transform.localScale = scale;
+		icon.flipX = isInitalPosLeft?true:false;
 	}
 
 	public void TurnLeft ()
 	{
-		if (_orgScale == 0){
-			_orgScale = icon.transform.localScale.x;
-		}
-
-		var scale = icon.transform.localScale;
-		scale.x = _orgScale;
-		icon.transform.localScale = scale;
-	}
-
-	public bool IsLeft{
-		get{
-			return icon.transform.localScale.x < 0;
-		}
+		icon.flipX = isInitalPosLeft?false:true;
 	}
 
 	public void MoveLeft(){

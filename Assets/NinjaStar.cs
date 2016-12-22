@@ -9,15 +9,14 @@ public class NinjaStar : MonoBehaviour {
 
 	void Awake () {
 		_rigidBody = GetComponent<Rigidbody2D>();
+		_rigidBody.angularVelocity = 800f;
 	}
 
 	public void Throw(float x, float y){
 		//Debug.LogError("throw, velocity: " + x + "," + y);
 
-		if (x < 0.1f && y < 1f){
-			y = 5;
-		}
 		_rigidBody.velocity = new Vector2(x, y);
+
 	}
 
 	public void Activate(){
@@ -38,12 +37,24 @@ public class NinjaStar : MonoBehaviour {
 				other.gameObject.GetComponent<NinjaStar>().Hit();
 				break;
 			case "Obstacle":
-				Debug.LogError("hit obstacle");
-				Hit();
+//				Debug.LogError("hit obstacle");
+//				Destroy(other.gameObject);
+				//Hit();
 				break;
 			
 		}
+	}
 
+	void OnCollisionExit2D(Collision2D other){
+
+		switch(other.gameObject.tag){
+			case "Obstacle":
+				//Debug.LogError("hit obstacle");
+				Destroy(other.gameObject);
+				Hit();
+				break;
+
+		}
 	}
 
 	public void Hit(){

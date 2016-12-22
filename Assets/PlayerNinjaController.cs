@@ -22,7 +22,7 @@ public class PlayerNinjaController : NinjaController{
 
 		ThrowStar (normalizedSwipeDir, throwSpeed);
 
-		LeanTween.delayedCall(0.2f, UnPauseNinja);
+		LeanTween.delayedCall(0.2f, ResumeMove);
 	}
 
 	protected override void RemoveListeners(){
