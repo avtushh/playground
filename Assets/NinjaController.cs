@@ -38,13 +38,12 @@ public class NinjaController : MonoBehaviour {
 	public virtual void Pause(){
 		isPaused = true;
 		PauseMove();
-		RemoveListeners();
+
 	}
 
 	public virtual void Resume(){
 		isPaused = false;
 		ResumeMove();
-		AddListeners();
 	}
 
 	public virtual void Die(){

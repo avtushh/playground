@@ -6,25 +6,6 @@ public class PlayerNinjaController : NinjaController{
 	public NinjaInput touchInput;
 	public LineRenderer swipeLine;
 
-	void TouchInput_OnTap (Vector2 obj)
-	{
-		swipeLine.enabled = false;
-		moveHoriz.SwitchDirection();
-	}
-
-	void TouchInput_OnSwipe (Vector2 normalizedSwipeDir, float swipeSpeed)
-	{
-		swipeLine.enabled = false;
-
-		if (normalizedSwipeDir.y < 0.1f) {
-			normalizedSwipeDir.y = 0.1f;
-		}
-
-		ThrowStar (normalizedSwipeDir, throwSpeed);
-
-		LeanTween.delayedCall(0.2f, ResumeMove);
-	}
-
 	protected override void RemoveListeners(){
 		base.RemoveListeners();
 		touchInput.TapEvent -= TouchInput_OnTap;
@@ -41,14 +22,47 @@ public class PlayerNinjaController : NinjaController{
 		touchInput.MouseUpEvent += TouchInput_OnMouseUp;
 	}
 
+	void TouchInput_OnTap (Vector2 obj)
+	{
+		if (isPaused)
+			return;
+		
+		swipeLine.enabled = false;
+		moveHoriz.SwitchDirection();
+	}
+
+	void TouchInput_OnSwipe (Vector2 normalizedSwipeDir, float swipeSpeed)
+	{
+		if (isPaused)
+			return;
+		
+		swipeLine.enabled = false;
+
+		if (normalizedSwipeDir.y < 0.1f) {
+			normalizedSwipeDir.y = 0.1f;
+		}
+
+		ThrowStar (normalizedSwipeDir, throwSpeed);
+
+		LeanTween.delayedCall(0.2f, ResumeMove);
+	}
+
+
+
 	void TouchInput_OnMouseUp (Vector3 obj)
 	{
+		if (isPaused)
+			return;
+		
 		moveHoriz.Resume();
 		swipeLine.enabled = false;
 	}
 
 	void TouchInput_OnUpdateSwipe (Vector2 mousePos)
 	{
+		if (isPaused)
+			return;
+		
 		var worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y));
 
 		swipeLine.enabled = true;

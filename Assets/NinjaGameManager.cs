@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class NinjaGameManager : MonoBehaviour {
 	
@@ -10,6 +11,13 @@ public class NinjaGameManager : MonoBehaviour {
 
 	public List<NinjaStar> ninjaStarsList;
 
+	public List<TweenStartRoundAnimation> roundAnimations = new List<TweenStartRoundAnimation>();
+
+	public GameObject messagePanel;
+	public Text scoreText;
+
+	public int currentRound; // 0,1,2
+
 	void Start(){
 		player.HitEvent += Player_HitEvent;
 		enemy.HitEvent += Enemy_HitEvent;
@@ -18,6 +26,35 @@ public class NinjaGameManager : MonoBehaviour {
 		enemy.ThrowStarEvent += Player_ThrowStarEvent;
 
 		ninjaStarsList = new List<NinjaStar>();
+
+		roundAnimations.ForEach(x => {
+			x.CompleteEvent += OnStartRoundAnimationComplete;	
+		});
+
+		//player.Pause();
+		//enemy.Pause();
+		currentRound = 0;
+		ShowNextRound();
+	}
+
+	void ShowNextRound(){
+		messagePanel.SetActive(false);
+		scoreText.gameObject.SetActive(false);
+		roundAnimations[currentRound].gameObject.SetActive(true);
+	}
+
+	void OnStartRoundAnimationComplete ()
+	{
+		LeanTween.delayedCall(1f, () => {
+			roundAnimations[currentRound].gameObject.SetActive(false);
+			StartNextRound();
+
+		});
+	}
+
+	void StartNextRound(){
+		currentRound++;
+		Resume();
 	}
 
 	void Player_ThrowStarEvent (NinjaStar obj)
@@ -29,11 +66,14 @@ public class NinjaGameManager : MonoBehaviour {
 	{
 		PauseGameForHit ();
 		ShowHitText();
-		LeanTween.delayedCall(gameObject, 1.5f, Resume);
+		LeanTween.delayedCall(gameObject, 1.5f, ShowNextRound);
 	}
 
 	void ShowHitText(){
-		
+
+		messagePanel.SetActive(true);
+		scoreText.gameObject.SetActive(true);
+		scoreText.text = scoreText.text.Replace("%", player.lives.ToString()).Replace("$", enemy.lives.ToString());
 	}
 
 	void ShowGameOverText(){
@@ -72,7 +112,7 @@ public class NinjaGameManager : MonoBehaviour {
 		if (player.lives <= 0){
 			//TODO: set loss!
 		}else{
-			PauseGameForHit ();
+			OnHit ();
 		}
 	}
 
