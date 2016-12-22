@@ -8,4 +8,6 @@ public class CreateParticlesOnDisable : MonoBehaviour {
 	void OnDisable(){
 		GameObject.Instantiate(particlesPrefab, transform.position, Quaternion.identity);
 	}
+
+
 }

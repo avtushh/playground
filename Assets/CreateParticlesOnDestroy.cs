@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CreateParticlesOnDestory : MonoBehaviour {
+public class CreateParticlesOnDestroy : MonoBehaviour {
 
 	public GameObject particlesPrefab;
 

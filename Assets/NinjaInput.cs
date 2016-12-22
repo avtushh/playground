@@ -58,7 +58,6 @@ public class NinjaInput : MonoBehaviour {
 			isMouseDown = false;
 
 			if (downTime < minSwipeTime){
-				Debug.LogError("on tap");
 				TapEvent(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
 			}else{
 				if (!didSwipe)

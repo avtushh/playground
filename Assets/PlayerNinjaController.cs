@@ -58,6 +58,14 @@ public class PlayerNinjaController : NinjaController{
 		swipeLine.SetPosition(1, new Vector3(worldPoint.x, worldPoint.y, transform.position.z + 1));
 
 		moveHoriz.paused = true;
+
+		if (worldPoint.x < transform.position.x){
+			//if (!moveHoriz.IsLeft)
+				moveHoriz.TurnLeft();
+		}else{
+			//if (moveHoriz.IsLeft)
+				moveHoriz.TurnRight();
+		}
 	}
 }
 

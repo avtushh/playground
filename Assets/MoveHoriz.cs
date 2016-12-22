@@ -8,7 +8,13 @@ public class MoveHoriz : MonoBehaviour {
 
 	public Transform leftBound, rightBound;
 
+	public AnimationCurve moveCurve;
+
 	LTDescr currentTween;
+
+	public Transform icon;
+
+	public float _orgScale;
 
 	bool _paused;
 
@@ -40,24 +46,60 @@ public class MoveHoriz : MonoBehaviour {
 	void Start () {
 		_left = leftBound.position.x;
 		_right = rightBound.position.x;
+		_orgScale = icon.transform.localScale.x;
 	}
 
 	public void MoveRight(){
+
+		TurnRight ();
+
 		direction = 1;
 		if (currentTween != null)
 			LeanTween.cancel(currentTween.uniqueId);
 		var time = Mathf.Abs(transform.position.x - _right) / 5;
 
-		currentTween = LeanTween.moveX(gameObject, _right, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveLeft);
+		currentTween = LeanTween.moveX(gameObject, _right, time).setEase(moveCurve).setOnComplete(MoveLeft);
+	}
+
+	public void TurnRight ()
+	{
+		if (_orgScale == 0){
+			_orgScale = icon.transform.localScale.x;
+		}
+
+
+		var scale = icon.transform.localScale;
+		scale.x = -_orgScale;
+		icon.transform.localScale = scale;
+	}
+
+	public void TurnLeft ()
+	{
+		if (_orgScale == 0){
+			_orgScale = icon.transform.localScale.x;
+		}
+
+		var scale = icon.transform.localScale;
+		scale.x = _orgScale;
+		icon.transform.localScale = scale;
+	}
+
+	public bool IsLeft{
+		get{
+			return icon.transform.localScale.x < 0;
+		}
 	}
 
 	public void MoveLeft(){
+
+		TurnLeft ();
+
 		direction = -1;
 		if (currentTween != null)
 			LeanTween.cancel(currentTween.uniqueId);
 		var time = Mathf.Abs(transform.position.x - _left) / 5;
 
-		currentTween = LeanTween.moveX(gameObject, _left, time).setEase(LeanTweenType.easeInOutSine).setOnComplete(MoveRight);
+		currentTween = LeanTween.moveX(gameObject, _left, time).setEase(moveCurve).setOnComplete(MoveRight);
 	}
 		
 	public void SwitchDirection(){
@@ -74,7 +116,7 @@ public class MoveHoriz : MonoBehaviour {
 
 	void Move ()
 	{
-		Debug.LogError("MOVE: " + direction);
+		//Debug.LogError("MOVE: " + direction);
 		if (direction == 1) {
 			MoveRight ();
 		}

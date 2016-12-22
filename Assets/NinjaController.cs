@@ -7,7 +7,7 @@ public class NinjaController : MonoBehaviour {
 
 	public GameObject ninjaStarPrefab;
 
-	public Throw ninjaStarThrow;
+	public NinjaStar ninjaStarThrow;
 
 	public float throwSpeed = 10f;
 
@@ -32,15 +32,15 @@ public class NinjaController : MonoBehaviour {
 		var throwXSpeed = normalizedSwipeDir.x * throwSpeed;
 		var throwYSpeed = normalizedSwipeDir.y * throwSpeed;
 
-		if (ninjaStarThrow == null){
+		//if (ninjaStarThrow == null){
 			var ninjaGo = GameObject.Instantiate (ninjaStarPrefab, transform.position, Quaternion.identity) as GameObject;
-			ninjaStarThrow = ninjaGo.GetComponent<Throw> ();
-		}else{
-			ninjaStarThrow.transform.position = transform.position;
-			ninjaStarThrow.Activate();
-		}
+			ninjaStarThrow = ninjaGo.GetComponent<NinjaStar> ();
+		//}else{
+		//	ninjaStarThrow.transform.position = transform.position;
+		//	ninjaStarThrow.Activate();
+		//}
 
-		ninjaStarThrow.ThrowMe(throwXSpeed, throwYSpeed);
+		ninjaStarThrow.Throw(throwXSpeed, throwYSpeed);
 	}
 
 
@@ -51,6 +51,19 @@ public class NinjaController : MonoBehaviour {
 
 	protected void PauseNinja(){
 		moveHoriz.paused = true;
+	}
+
+	void OnTriggerEnter2D(Collider2D other) {
+
+		if (other.gameObject.CompareTag("Bullet")){
+
+			var star = other.gameObject.GetComponent<NinjaStar>();
+
+			if (star.tagToHit == gameObject.tag){
+				Debug.LogError("Hit " + star.tagToHit);
+				star.Hit();
+			}
+		}
 	}
 }
 
