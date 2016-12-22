@@ -8,13 +8,13 @@ public class NinjaController : MonoBehaviour {
 
 	public GameObject ninjaStarPrefab;
 
-	public NinjaStar ninjaStarThrow;
-
 	public float throwSpeed = 10f;
 
 	public int lives = 3;
 
 	public bool isPaused = false;
+
+	public bool isThrowing = false;
 
 	public event Action<int,NinjaStar> HitEvent = (lives,star) => {};
 	public event Action<NinjaStar> ThrowStarEvent = (star) => {};
@@ -56,24 +56,19 @@ public class NinjaController : MonoBehaviour {
 		var throwXSpeed = normalizedSwipeDir.x * throwSpeed;
 		var throwYSpeed = normalizedSwipeDir.y * throwSpeed;
 
-		//if (ninjaStarThrow == null){
-			var ninjaGo = GameObject.Instantiate (ninjaStarPrefab, transform.position, Quaternion.identity) as GameObject;
-			ninjaStarThrow = ninjaGo.GetComponent<NinjaStar> ();
-		//}else{
-		//	ninjaStarThrow.transform.position = transform.position;
-		//	ninjaStarThrow.Activate();
-		//}
+		var ninjaGo = GameObject.Instantiate (ninjaStarPrefab, transform.position, Quaternion.identity) as GameObject;
+		var ninjaStarThrow = ninjaGo.GetComponent<NinjaStar> ();
 
 		ninjaStarThrow.Throw(throwXSpeed, throwYSpeed);
 		ThrowStarEvent(ninjaStarThrow);
 	}
 
 	protected void ResumeMove(){
-		moveHoriz.paused = false;
+		moveHoriz.Resume();
 	}
 
 	protected void PauseMove(){
-		moveHoriz.paused = true;
+		moveHoriz.Pause();
 	}
 
 	void OnTriggerEnter2D(Collider2D other) {

@@ -43,7 +43,7 @@ public class PlayerNinjaController : NinjaController{
 
 	void TouchInput_OnMouseUp (Vector3 obj)
 	{
-		moveHoriz.paused = false;
+		moveHoriz.Resume();
 		swipeLine.enabled = false;
 	}
 
@@ -57,7 +57,7 @@ public class PlayerNinjaController : NinjaController{
 		swipeLine.SetPosition(0, new Vector3(transform.position.x, transform.position.y, transform.position.z + 1));
 		swipeLine.SetPosition(1, new Vector3(worldPoint.x, worldPoint.y, transform.position.z + 1));
 
-		moveHoriz.paused = true;
+		moveHoriz.Pause();
 
 		if (worldPoint.x < transform.position.x){
 			//if (!moveHoriz.IsLeft)

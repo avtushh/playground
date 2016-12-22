@@ -18,29 +18,6 @@ public class MoveHoriz : MonoBehaviour {
 
 	bool _paused;
 
-	public bool paused{
-		get{
-			return _paused;
-		}
-
-		set{
-			if (_paused == value){
-				return;
-			}
-
-			_paused = value;
-
-			if (_paused)
-				LeanTween.cancel(gameObject);
-			else{
-				Move();
-			}
-
-
-		}
-
-	}
-
 	float _right, _left;
 
 	void Start () {
@@ -48,17 +25,19 @@ public class MoveHoriz : MonoBehaviour {
 		_right = rightBound.position.x;
 	}
 
-	public void MoveRight(){
-
-		TurnRight ();
-
-		direction = 1;
-		if (currentTween != null)
-			LeanTween.cancel(currentTween.uniqueId);
-		var time = Mathf.Abs(transform.position.x - _right) / 5;
-
-		currentTween = LeanTween.moveX(gameObject, _right, time).setEase(moveCurve).setOnComplete(MoveLeft);
+	public void Pause(){
+		_paused = true;
+		if (currentTween != null){
+			LeanTween.cancel(gameObject, currentTween.id);
+			currentTween = null;
+		}
 	}
+
+	public void Resume(){
+		Move();
+	}
+
+
 
 	public void TurnRight ()
 	{
@@ -70,13 +49,29 @@ public class MoveHoriz : MonoBehaviour {
 		icon.flipX = isInitalPosLeft?false:true;
 	}
 
+	public void MoveRight(){
+
+		TurnRight ();
+
+		direction = 1;
+		if (currentTween != null){
+			LeanTween.cancel(gameObject, currentTween.id);
+		}
+
+		var time = Mathf.Abs(transform.position.x - _right) / 5;
+
+		currentTween = LeanTween.moveX(gameObject, _right, time).setEase(moveCurve).setOnComplete(MoveLeft);
+	}
+
 	public void MoveLeft(){
 
 		TurnLeft ();
 
 		direction = -1;
-		if (currentTween != null)
-			LeanTween.cancel(currentTween.uniqueId);
+		if (currentTween != null){
+			LeanTween.cancel(gameObject, currentTween.id);
+		}
+
 		var time = Mathf.Abs(transform.position.x - _left) / 5;
 
 		currentTween = LeanTween.moveX(gameObject, _left, time).setEase(moveCurve).setOnComplete(MoveRight);

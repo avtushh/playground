@@ -2,7 +2,13 @@ using UnityEngine;
 using System.Collections;
 
 public class EnemyNinjaController : NinjaController{
-	
+
+	public float delayBetweenStars = 0.5f;
+
+	[Header("Throw Frequency")]
+	public int minFreq = 3;
+	public int maxFreq = 8;
+
 	void Start(){
 		Init ();
 	}
@@ -10,39 +16,57 @@ public class EnemyNinjaController : NinjaController{
 	void Init ()
 	{
 		moveHoriz.MoveRight ();
-		DelayedThrow ();
-		DelayedChangedPosition ();
+
+		//StartCoroutine(ChangeDirectionCoro());
+		//StartCoroutine(ThrowCoro());
 	}
 
-	void DelayedThrow(){
-		var delay = Random.Range(3, 8);
-
-		LeanTween.delayedCall(gameObject, delay, TryThrow);
-
-	}
-
-	void DelayedChangedPosition(){
-		var delay = Random.Range(2, 8);
-
-		LeanTween.delayedCall(gameObject, delay, moveHoriz.SwitchDirection);
-	}
-
-	void TryThrow(){
-		//Debug.LogError("try throw");
-		if (ninjaStarThrow == null || !ninjaStarThrow.gameObject.activeInHierarchy){
-
-			var direction = new Vector2(Random.Range(0, 1f), Random.Range(0.1f, 1f));
-			ThrowStar(direction, -throwSpeed);
-			DelayedThrow();
-		}else{
-			LeanTween.delayedCall(gameObject, 1f, TryThrow);
+	IEnumerator ChangeDirectionCoro(){
+		while(true){
+			if (!isPaused && !isThrowing){
+				var delay = Random.Range(2, 8);
+				yield return new WaitForSeconds(delay);
+				moveHoriz.SwitchDirection();
+			}
 		}
+	}
+
+	IEnumerator ThrowCoro(){
+		while(true){
+			if (!isPaused){
+				
+				var delay = Random.Range(minFreq, maxFreq);
+				yield return new WaitForSeconds(delay);
+
+				isThrowing = true;
+
+				var numStars = Random.Range(1, 4);
+
+				for (int i = 0; i < numStars; i++) {
+					RandomDirectionStarThrow();
+
+					if (i == 0){
+						PauseMove();
+					}
+					yield return new WaitForSeconds(delayBetweenStars);
+				}
+
+				isThrowing = false;
+
+				ResumeMove();
+			}
+		}
+	}
+
+	void RandomDirectionStarThrow(){
+		var direction = new Vector2(Random.Range(0.1f, 1f), Random.Range(0.1f, 1f));
+		//ThrowStar(direction, -throwSpeed);
 	}
 
 	public override void Pause ()
 	{
 		base.Pause ();
-		LeanTween.cancel(gameObject);
+		StopAllCoroutines();
 	}
 
 	public override void Resume ()

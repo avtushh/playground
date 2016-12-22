@@ -52,6 +52,12 @@ public class NinjaStar : MonoBehaviour {
 				//Debug.LogError("hit obstacle");
 				Destroy(other.gameObject);
 				Hit();
+
+//				if (_rigidBody.velocity.magnitude < 5){
+//					_rigidBody.velocity *= 2;
+//				}
+
+
 				break;
 
 		}
