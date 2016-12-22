@@ -31,10 +31,12 @@ public class NinjaGameManager : MonoBehaviour {
 			x.CompleteEvent += OnStartRoundAnimationComplete;	
 		});
 
-		//player.Pause();
-		//enemy.Pause();
+		player.Pause();
+		enemy.Pause();
+
 		currentRound = 0;
-		ShowNextRound();
+
+		LeanTween.delayedCall(1f, ShowNextRound);
 	}
 
 	void ShowNextRound(){
@@ -48,12 +50,12 @@ public class NinjaGameManager : MonoBehaviour {
 		LeanTween.delayedCall(1f, () => {
 			roundAnimations[currentRound].gameObject.SetActive(false);
 			StartNextRound();
-
 		});
 	}
 
 	void StartNextRound(){
 		currentRound++;
+
 		Resume();
 	}
 

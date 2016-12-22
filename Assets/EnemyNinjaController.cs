@@ -10,7 +10,7 @@ public class EnemyNinjaController : NinjaController{
 	public int maxFreq = 8;
 
 	void Start(){
-		Init ();
+		//Init ();
 	}
 
 	void Init ()
