@@ -17,8 +17,24 @@ public class EnemyNinjaController : NinjaController{
 	{
 		moveHoriz.MoveRight ();
 
-		//StartCoroutine(ChangeDirectionCoro());
+		StartCoroutine(ChangeDirectionCoro());
 		//StartCoroutine(ThrowCoro());
+
+		DelayThrowStar();
+	}
+
+	void DelayThrowStar(){
+		var delay = Random.Range(minFreq, maxFreq);
+		LeanTween.delayedCall(gameObject, delay, ThrowStars);
+	}
+
+	void ThrowStars(){
+		PauseMove();
+		RandomDirectionStarThrow();
+		LeanTween.delayedCall(gameObject, 0.5f,() => {
+			ResumeMove();
+			DelayThrowStar();
+		} );
 	}
 
 	IEnumerator ChangeDirectionCoro(){
@@ -46,21 +62,21 @@ public class EnemyNinjaController : NinjaController{
 					RandomDirectionStarThrow();
 
 					if (i == 0){
-						PauseMove();
+						//PauseMove();
 					}
 					yield return new WaitForSeconds(delayBetweenStars);
 				}
 
 				isThrowing = false;
 
-				ResumeMove();
+				//ResumeMove();
 			}
 		}
 	}
 
 	void RandomDirectionStarThrow(){
 		var direction = new Vector2(Random.Range(0.1f, 1f), Random.Range(0.1f, 1f));
-		//ThrowStar(direction, -throwSpeed);
+		ThrowStar(direction, -throwSpeed);
 	}
 
 	public override void Pause ()
