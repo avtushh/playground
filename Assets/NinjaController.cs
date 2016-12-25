@@ -8,6 +8,8 @@ public class NinjaController : MonoBehaviour {
 
 	public GameObject ninjaStarPrefab;
 
+	public SpriteRenderer icon;
+
 	public float throwSpeed = 10f;
 
 	public int lives = 3;
@@ -15,6 +17,8 @@ public class NinjaController : MonoBehaviour {
 	public bool isPaused = false;
 
 	public bool isThrowing = false;
+
+
 
 	public event Action<int,NinjaStar> HitEvent = (lives,star) => {};
 	public event Action<NinjaStar> ThrowStarEvent = (star) => {};
@@ -38,12 +42,29 @@ public class NinjaController : MonoBehaviour {
 	public virtual void Pause(){
 		isPaused = true;
 		PauseMove();
-
 	}
 
 	public virtual void Resume(){
 		isPaused = false;
 		ResumeMove();
+	}
+
+	public void ShowHitAnimation (float hitAnimationTime)
+	{
+		StartCoroutine(ShowHitAnimationCoro(hitAnimationTime));
+	}
+
+	IEnumerator ShowHitAnimationCoro (float hitAnimationTime)
+	{
+		float time = 0;
+		float blinkSpeed = 0.075f;
+
+		while (time < hitAnimationTime){
+			icon.enabled = !icon.enabled;
+			yield return new WaitForSeconds(blinkSpeed);
+			time += blinkSpeed;
+		}
+		icon.enabled = true;
 	}
 
 	public virtual void Die(){
@@ -68,6 +89,7 @@ public class NinjaController : MonoBehaviour {
 
 	protected void PauseMove(){
 		moveHoriz.Pause();
+
 	}
 
 	void OnTriggerEnter2D(Collider2D other) {

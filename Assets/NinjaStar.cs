@@ -12,6 +12,12 @@ public class NinjaStar : MonoBehaviour {
 		_rigidBody.angularVelocity = 800f;
 	}
 
+	public bool IsPlayerStar{
+		get{
+			return tagToHit == "Enemy";
+		}
+	}
+
 	public void Throw(float x, float y){
 		//Debug.LogError("throw, velocity: " + x + "," + y);
 
@@ -31,15 +37,17 @@ public class NinjaStar : MonoBehaviour {
 
 		switch(other.gameObject.tag){
 			case "Bullet":
-				Debug.LogError("hit another bullet");
+				var otherStar = other.gameObject.GetComponent<NinjaStar>();
 
-				Hit();
-				other.gameObject.GetComponent<NinjaStar>().Hit();
+				if (otherStar.tagToHit != tagToHit){
+					Debug.LogError("hit another bullet");
+					Hit();
+				}
+
 				break;
-			case "Obstacle":
-//				Debug.LogError("hit obstacle");
-//				Destroy(other.gameObject);
-				//Hit();
+			case "Shield":
+				other.gameObject.SetActive(false);
+				Hit();
 				break;
 			
 		}
@@ -50,7 +58,7 @@ public class NinjaStar : MonoBehaviour {
 		switch(other.gameObject.tag){
 			case "Obstacle":
 				//Debug.LogError("hit obstacle");
-				Destroy(other.gameObject);
+				other.gameObject.SetActive(false);
 				Hit();
 
 //				if (_rigidBody.velocity.magnitude < 5){

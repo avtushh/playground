@@ -30,8 +30,16 @@ public class EnemyNinjaController : NinjaController{
 
 	void ThrowStars(){
 		PauseMove();
-		RandomDirectionStarThrow();
-		LeanTween.delayedCall(gameObject, 0.5f,() => {
+
+		var numStars = Random.Range(1, 5);
+
+		var throwGap = 0.3f;
+
+		for(int i = 0; i < numStars; i++){
+			LeanTween.delayedCall(gameObject, (i * throwGap), RandomDirectionStarThrow);
+		}
+
+		LeanTween.delayedCall(gameObject, throwGap * numStars + 0.2f,() => {
 			ResumeMove();
 			DelayThrowStar();
 		} );
@@ -83,6 +91,7 @@ public class EnemyNinjaController : NinjaController{
 	{
 		base.Pause ();
 		StopAllCoroutines();
+		LeanTween.cancel(gameObject);
 	}
 
 	public override void Resume ()

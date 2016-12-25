@@ -6,6 +6,10 @@ public class PlayerNinjaController : NinjaController{
 	public NinjaInput touchInput;
 	public LineRenderer swipeLine;
 
+	public PowerUp.PowerupType activePowerup = PowerUp.PowerupType.None;
+
+	public GameObject shield;
+
 	protected override void RemoveListeners(){
 		base.RemoveListeners();
 		touchInput.TapEvent -= TouchInput_OnTap;
@@ -20,6 +24,25 @@ public class PlayerNinjaController : NinjaController{
 		touchInput.SwipeDoneEvent += TouchInput_OnSwipe;
 		touchInput.SwipeUpdatedEvent += TouchInput_OnUpdateSwipe;
 		touchInput.MouseUpEvent += TouchInput_OnMouseUp;
+	}
+
+	public override void Pause ()
+	{
+		base.Pause ();
+		shield.SetActive(false);
+	}
+
+	public void SetPowerUp (PowerUp.PowerupType powerUpType)
+	{
+		switch(powerUpType){
+			case PowerUp.PowerupType.Shield:
+				SetShield();
+				break;
+			case PowerUp.PowerupType.Split:
+				break;
+			case PowerUp.PowerupType.DestroyObstalceGroup:
+				break;
+		}
 	}
 
 	void TouchInput_OnTap (Vector2 obj)
@@ -47,6 +70,11 @@ public class PlayerNinjaController : NinjaController{
 		LeanTween.delayedCall(0.2f, ResumeMove);
 	}
 
+
+	void SetShield ()
+	{
+		shield.SetActive(true);
+	}
 
 
 	void TouchInput_OnMouseUp (Vector3 obj)

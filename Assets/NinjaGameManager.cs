@@ -2,46 +2,87 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Linq;
 
 public class NinjaGameManager : MonoBehaviour {
 	
 	public NinjaController player, enemy;
 
-	public LivesView playerLivesView, enemyLivesView;
-
-	public List<NinjaStar> ninjaStarsList;
+	//public LivesView playerLivesView, enemyLivesView;
 
 	public List<TweenStartRoundAnimation> roundAnimations = new List<TweenStartRoundAnimation>();
+
+	public List<ObstacleUnit> obstacles = new List<ObstacleUnit>();
+	public List<ObstacleGroup> obstacleGroups = new List<ObstacleGroup>();
 
 	public GameObject messagePanel;
 	public Text scoreText;
 
 	public int currentRound; // 0,1,2
 
+	public int playerScore; 
+	public int enemyScore;
+
+	string scoreStr;
+	public GameObject endGamePanel;
+	public Button  playAgainButton;
+	public Text endText;
+
+	public PowerUpsManager powerupManager;
+
 	void Start(){
+
+		scoreStr = scoreText.text;
+
+		AddListeners ();
+
+		obstacles = FindObjectsOfType<ObstacleUnit>().ToList();
+		if (obstacleGroups.Count() == 0)
+			obstacleGroups = FindObjectsOfType<ObstacleGroup>().ToList();
+
+		InitGame ();
+	}
+
+	void AddListeners ()
+	{
 		player.HitEvent += Player_HitEvent;
 		enemy.HitEvent += Enemy_HitEvent;
-
-		player.ThrowStarEvent += Player_ThrowStarEvent;
-		enemy.ThrowStarEvent += Player_ThrowStarEvent;
-
-		ninjaStarsList = new List<NinjaStar>();
-
-		roundAnimations.ForEach(x => {
-			x.CompleteEvent += OnStartRoundAnimationComplete;	
+		roundAnimations.ForEach (x =>  {
+			x.CompleteEvent += OnStartRoundAnimationComplete;
 		});
+		playAgainButton.onClick.AddListener(InitGame);
+	}
 
-		player.Pause();
-		enemy.Pause();
-
+	void InitGame ()
+	{
+		messagePanel.SetActive(false);
+		endGamePanel.SetActive(false);
+		playerScore = 0;
+		enemyScore = 0;
+		player.Pause ();
+		enemy.Pause ();
+		powerupManager.Pause();
 		currentRound = 0;
+		obstacleGroups.ForEach(x => x.gameObject.SetActive(false));
+		obstacles.ForEach(x => x.gameObject.SetActive(true));
 
-		LeanTween.delayedCall(1f, ShowNextRound);
+		StartCoroutine(ShowObstaclesOnInitRoundCoro());
+
+
+	}
+
+	IEnumerator ShowObstaclesOnInitRoundCoro(){
+	
+		for (int i = 0; i < obstacleGroups.Count; i++) {
+			obstacleGroups[i].gameObject.SetActive(true);
+			yield return new WaitForSeconds(0.3f);
+		}
+
+		ShowNextRound();
 	}
 
 	void ShowNextRound(){
 		messagePanel.SetActive(false);
-		scoreText.gameObject.SetActive(false);
 		roundAnimations[currentRound].gameObject.SetActive(true);
 	}
 
@@ -59,75 +100,85 @@ public class NinjaGameManager : MonoBehaviour {
 		Resume();
 	}
 
-	void Player_ThrowStarEvent (NinjaStar obj)
+	public float hitAnimationTime = 2f;
+
+	void OnHit (NinjaController hitNinja)
 	{
-		ninjaStarsList.Add(obj);
+		Pause();
+		RemoveAllStars();
+
+		hitNinja.ShowHitAnimation(hitAnimationTime);
+
+		LeanTween.delayedCall(hitAnimationTime, () => {
+			ShowHitText();
+
+			if (playerScore >= 2){
+				LeanTween.delayedCall(gameObject, 1.5f, Win);
+			}else if (enemyScore >= 2){
+				LeanTween.delayedCall(gameObject, 1.5f, GameOver);
+			}else{
+				LeanTween.delayedCall(gameObject, 1.5f, ShowNextRound);
+			}
+		});
 	}
 
-	void OnHit ()
-	{
-		PauseGameForHit ();
-		ShowHitText();
-		LeanTween.delayedCall(gameObject, 1.5f, ShowNextRound);
+	void RemoveAllStars(){
+		var stars = FindObjectsOfType<NinjaStar>();
+
+		stars.ToList().ForEach(x => {
+			Destroy(x.gameObject);
+		});
 	}
 
 	void ShowHitText(){
 
 		messagePanel.SetActive(true);
-		scoreText.gameObject.SetActive(true);
-		scoreText.text = scoreText.text.Replace("%", player.lives.ToString()).Replace("$", enemy.lives.ToString());
+		scoreText.text = scoreStr.Replace("%", playerScore.ToString()).Replace("$", enemyScore.ToString());
 	}
 
 	void ShowGameOverText(){
-
-
+		endGamePanel.SetActive(true);
+		endText.text = "Game Over";
 	}
 
 	void ShowWinText(){
-
-
+		endGamePanel.SetActive(true);
+		endText.text = "You Win!";
 	}
 
-
-
-
-	void PauseGameForHit ()
+	void Pause ()
 	{
 		enemy.Pause ();
 		player.Pause ();
-		ninjaStarsList.ForEach (x =>  {
-			Destroy (x);
-		});
-		ninjaStarsList.Clear();
+		powerupManager.Pause();
 	}
 
 	void Resume(){
 		enemy.Resume();
 		player.Resume();
+		powerupManager.Resume();
+	}
+
+	void GameOver(){
+		ShowGameOverText();
+	}
+
+	void Win(){
+		ShowWinText();
 	}
 
 	void Player_HitEvent (int lives, NinjaStar obj)
 	{
-		ninjaStarsList.Remove(obj);
-		playerLivesView.SetLives(player.lives);
+		enemyScore++;
 
-		if (player.lives <= 0){
-			//TODO: set loss!
-		}else{
-			OnHit ();
-		}
+		OnHit (player);
 	}
 
 	void Enemy_HitEvent (int lives, NinjaStar obj)
 	{
-		ninjaStarsList.Remove(obj);
-		enemyLivesView.SetLives(enemy.lives);
+		playerScore++;
 
-		if (enemy.lives <= 0){
-			//TODO: set win!
-		}else{
-			OnHit ();
-		}
+		OnHit (enemy);
 	}
 
 
