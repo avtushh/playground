@@ -29,8 +29,6 @@ public class PlayerNinjaController : NinjaController{
 
 	}
 
-
-
 	void TouchInput_OnTap (Vector2 obj)
 	{
 		if (isPaused)
@@ -57,6 +55,10 @@ public class PlayerNinjaController : NinjaController{
 	{
 		if (isPaused || _isThrowing)
 			return;
+
+		if (!canThrow()){
+			return;
+		}
 													
 		var endPoint = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y));
 		var startPoint = Camera.main.ScreenToWorldPoint(new Vector3(downMousePos.x, downMousePos.y));
@@ -90,6 +92,10 @@ public class PlayerNinjaController : NinjaController{
 	{
 		if (isPaused || _isThrowing)
 			return;
+
+		if (!canThrow()){
+			return;
+		}
 
 		_isSwiping = false;
 		

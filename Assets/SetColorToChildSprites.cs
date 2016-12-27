@@ -11,13 +11,11 @@ public class SetColorToChildSprites : MonoBehaviour {
 	void Awake(){
 		var sprites = transform.GetComponentsInChildren<SpriteRenderer>();
 
-		for (int i = 0; i < sprites.Length; i++) {
-			if (!random){
-				sprites[i].color = color;
-			}else{
+		if (random)
+			color = GetRandomColor();
 
-				sprites[i].color = GetRandomColor();
-			}
+		for (int i = 0; i < sprites.Length; i++) {
+			sprites[i].color = color;
 		}
 	}
 

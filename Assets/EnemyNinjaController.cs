@@ -24,16 +24,21 @@ public class EnemyNinjaController : NinjaController{
 	}
 
 	void DelayThrowStar(){
-		var delay = Random.Range(minFreq, maxFreq);
-		LeanTween.delayedCall(gameObject, delay, ThrowStars);
+		LeanTween.delayedCall(gameObject, Random.Range(minFreq, maxFreq), ThrowStars);
 	}
 
 	void ThrowStars(){
+
+		if (!canThrow()){
+			DelayThrowStar();
+			return;
+		}
+
 		PauseMove();
 
 		StartThrowAnimation(true);
 
-		var numStars = Random.Range(1, 4);
+		var numStars = activeStars.Count;
 
 		var throwGap = 0.4f;
 

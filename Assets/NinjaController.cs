@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class NinjaController : MonoBehaviour {
 
 	public MoveHoriz moveHoriz;
 
-	public GameObject ninjaStarPrefab;
-
 	public SpriteRenderer icon;
+
+	public GameObject shield;
 
 	public float throwSpeed = 10f;
 
@@ -22,18 +24,59 @@ public class NinjaController : MonoBehaviour {
 
 	public PowerUp.PowerupType activePowerup = PowerUp.PowerupType.None;
 
-	public GameObject shield;
+	public string tagToHit;
 
 	float _powerUpTime;
 
-	public string tagToHit;
+	protected List<NinjaStar> activeStars;
 
 	public event Action<NinjaStar> HitEvent = (star) => {};
 	public event Action<NinjaStar> ThrowStarEvent = (star) => {};
+	public event Action<NinjaStar> PickUpStarEvent = (star) => {};
+
+	public int ActiveStarsCount{
+		get{
+			return activeStars.Count;
+		}
+	}
+
+	#region behaviour methods
 
 	void Start () {
 		AddListeners();
 		orgScale = icon.transform.localScale;
+	}
+
+	void OnTriggerEnter2D(Collider2D other) {
+
+		if (isPaused)
+			return;
+
+		if (other.gameObject.CompareTag("Bullet")){
+
+			var star = other.gameObject.GetComponent<NinjaStar>();
+
+			if (!star.isGrounded){
+				if (star.tagToHit == gameObject.tag){
+					//Debug.LogError("Hit " + star.tagToHit);
+					HitEvent(star);
+					star.Hit();
+				}else{
+					//PickUpStar (star);
+				}
+			}else{
+				PickUpStar (star);
+			}
+		}
+	}
+
+	void PickUpStar (NinjaStar star)
+	{
+		star.Pickup ();
+		star.transform.position = transform.position;
+		star.transform.SetParent (icon.transform, true);
+		activeStars.Add (star);
+		PickUpStarEvent (star);
 	}
 
 	void Update(){
@@ -41,6 +84,10 @@ public class NinjaController : MonoBehaviour {
 			UpdatePowerup ();
 		}
 	}
+
+	#endregion
+
+	#region powerup
 
 	void UpdatePowerup ()
 	{
@@ -58,8 +105,13 @@ public class NinjaController : MonoBehaviour {
 		activePowerup = PowerUp.PowerupType.None;
 	}
 
-	void OnDestroy(){
-		RemoveListeners();
+	#endregion
+
+	#region lifecycle
+
+	public void Init(){
+		Pause();
+		activeStars = new List<NinjaStar>();
 	}
 
 	protected virtual void AddListeners(){
@@ -81,6 +133,13 @@ public class NinjaController : MonoBehaviour {
 		isPaused = false;
 		ResumeMove();
 	}
+
+	void OnDestroy(){
+		RemoveListeners();
+	}
+
+	#endregion
+
 
 	public void ShowHitAnimation (float hitAnimationTime)
 	{
@@ -104,13 +163,32 @@ public class NinjaController : MonoBehaviour {
 		Destroy(gameObject);
 	}
 
+	#region throw
+
+	protected bool canThrow(){
+		return activeStars.Count > 0;
+	}
+
 	protected NinjaStar ThrowStar (Vector2 normalizedSwipeDir, float throwSpeed)
 	{
-		var star = CreateStar ();
-
 		var throwXSpeed = normalizedSwipeDir.x * throwSpeed;
 		var throwYSpeed = normalizedSwipeDir.y * throwSpeed;
+		var star = DequeueStar();
 		star.Throw(new Vector2(throwXSpeed, throwYSpeed));
+		return star;
+	}
+
+	public NinjaStar ThrowRandomDirectionStar(float throwSpeed){
+		var star = DequeueStar();
+		star.ThrowRandomDirection(throwSpeed);
+		return star;
+	}
+
+	NinjaStar DequeueStar(){
+		var star = activeStars.First();
+		star.SetTarget(tagToHit);
+		star.transform.SetParent(null);
+		activeStars.Remove(star);
 		ThrowStarEvent(star);
 		return star;
 	}
@@ -131,21 +209,7 @@ public class NinjaController : MonoBehaviour {
 		LeanTween.scale(icon.gameObject, orgScale, 0.1f).setEase (LeanTweenType.easeInOutSine);
 	}
 
-	public NinjaStar ThrowRandomDirectionStar(float throwSpeed){
-		var star = CreateStar ();
-		star.ThrowRandomDirection(throwSpeed);
-		ThrowStarEvent(star);
-		return star;
-	}
-
-	NinjaStar CreateStar ()
-	{
-		var starGo = Instantiate (ninjaStarPrefab, transform.position, Quaternion.identity) as GameObject;
-		var star = starGo.GetComponent<NinjaStar> ();
-		star.SetTarget (tagToHit);
-		star.IsFireball = activePowerup == PowerUp.PowerupType.FireBall;
-		return star;
-	}
+	#endregion
 
 	protected void ResumeMove(){
 		moveHoriz.Resume();
@@ -156,23 +220,6 @@ public class NinjaController : MonoBehaviour {
 
 	}
 
-	void OnTriggerEnter2D(Collider2D other) {
-
-		if (isPaused)
-			return;
-		
-		if (other.gameObject.CompareTag("Bullet")){
-
-			var star = other.gameObject.GetComponent<NinjaStar>();
-
-			if (star.tagToHit == gameObject.tag){
-				//Debug.LogError("Hit " + star.tagToHit);
-				HitEvent(star);
-				star.Hit();
-			}
-		}
-	}
-
 	public void SetPowerUp (PowerUp.PowerupType powerUpType)
 	{
 		activePowerup = powerUpType;
@@ -181,10 +228,6 @@ public class NinjaController : MonoBehaviour {
 		switch(activePowerup){
 			case PowerUp.PowerupType.Shield:
 				ToggleShield(true);
-				break;
-			case PowerUp.PowerupType.Split:
-				break;
-			case PowerUp.PowerupType.FireBall:
 				break;
 		}
 	}

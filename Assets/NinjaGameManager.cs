@@ -29,6 +29,7 @@ public class NinjaGameManager : MonoBehaviour {
 	public Text endText;
 
 	public PowerUpsManager powerupManager;
+	public StarManager starManager;
 
 	void Start(){
 
@@ -47,10 +48,17 @@ public class NinjaGameManager : MonoBehaviour {
 	{
 		player.HitEvent += Player_HitEvent;
 		enemy.HitEvent += Enemy_HitEvent;
+		enemy.ThrowStarEvent += OnThrowStar;
+		player.ThrowStarEvent += OnThrowStar;
 		roundAnimations.ForEach (x =>  {
 			x.CompleteEvent += OnStartRoundAnimationComplete;
 		});
 		playAgainButton.onClick.AddListener(InitGame);
+	}
+
+	void OnThrowStar (NinjaStar obj)
+	{
+		
 	}
 
 	void InitGame ()
@@ -59,13 +67,14 @@ public class NinjaGameManager : MonoBehaviour {
 		endGamePanel.SetActive(false);
 		playerScore = 0;
 		enemyScore = 0;
-		player.Pause ();
-		enemy.Pause ();
+		player.Init();
+		enemy.Init();
+
 		powerupManager.Pause();
 		currentRound = 0;
 		obstacleGroups.ForEach(x => x.gameObject.SetActive(false));
 		obstacles.ForEach(x => x.gameObject.SetActive(true));
-
+		starManager.Clear();
 		StartCoroutine(ShowObstaclesOnInitRoundCoro());
 
 
@@ -96,6 +105,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 	void StartNextRound(){
 		currentRound++;
+		starManager.InitRound();
 
 		Resume();
 	}
@@ -105,8 +115,7 @@ public class NinjaGameManager : MonoBehaviour {
 	void OnHit (NinjaController hitNinja)
 	{
 		Pause();
-		RemoveAllStars();
-
+		starManager.Clear();
 		hitNinja.ShowHitAnimation(hitAnimationTime);
 
 		LeanTween.delayedCall(hitAnimationTime, () => {
@@ -119,14 +128,6 @@ public class NinjaGameManager : MonoBehaviour {
 			}else{
 				LeanTween.delayedCall(gameObject, 1.5f, ShowNextRound);
 			}
-		});
-	}
-
-	void RemoveAllStars(){
-		var stars = FindObjectsOfType<NinjaStar>();
-
-		stars.ToList().ForEach(x => {
-			Destroy(x.gameObject);
 		});
 	}
 
@@ -151,12 +152,14 @@ public class NinjaGameManager : MonoBehaviour {
 		enemy.Pause ();
 		player.Pause ();
 		powerupManager.Pause();
+		starManager.Pause();
 	}
 
 	void Resume(){
 		enemy.Resume();
 		player.Resume();
 		powerupManager.Resume();
+		starManager.Resume();
 	}
 
 	void GameOver(){

@@ -24,8 +24,6 @@ public class PowerUp : MonoBehaviour
 	{
 		type = EnumUtils.RandomEnumValue<PowerupType> (true);
 
-		type = PowerupType.Split;
-
 		_sprRenderer = GetComponent<SpriteRenderer> ();
 
 		switch (type) {
@@ -48,11 +46,17 @@ public class PowerUp : MonoBehaviour
 		if (other.tag == "Bullet") {
 			var ninjaStar = other.gameObject.GetComponent<NinjaStar> ();
 
-			if (type == PowerupType.Split) {
-				ninjaStar.Split ();				
-			} else {
-				NinjaController ninjaController = ninjaStar.IsPlayerStar ? (NinjaController)FindObjectOfType<PlayerNinjaController> () : (NinjaController)FindObjectOfType<EnemyNinjaController> ();
-				ninjaController.SetPowerUp (type);
+			switch (type) {
+				case PowerupType.FireBall:
+					ninjaStar.IsFireball = true;
+					break;
+				case PowerupType.Split:
+					ninjaStar.Split ();	
+					break;
+				default:
+					NinjaController ninjaController = ninjaStar.IsPlayerStar ? (NinjaController)FindObjectOfType<PlayerNinjaController> () : (NinjaController)FindObjectOfType<EnemyNinjaController> ();
+					ninjaController.SetPowerUp (type);
+					break;
 			}
 
 			HitEvent ();
