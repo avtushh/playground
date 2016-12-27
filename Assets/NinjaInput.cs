@@ -4,17 +4,19 @@ using System;
 
 public class NinjaInput : MonoBehaviour {
 
-	public event Action<Vector2> SwipeUpdatedEvent = (v1) => {};
+	public event Action<Vector3, Vector3> SwipeUpdatedEvent = (v1, v2) => {};
 	public event Action<Vector2> TapEvent = v => {};
 	public event Action<Vector2, float> SwipeDoneEvent = (v,f) => {};
 	public event Action<Vector3> MouseUpEvent = (v) => {};
 
 	public Vector2 swipeDir;
 	public float swipeSpeed;
+	public float swipeDistance;
 
+	public Vector3 downMousePos;
 
 	public float minSwipeTime = 0.2f;
-	public float maxSwipeTime = 1f;
+	public float maxSwipeTime = 0.2f;
 
 	bool isMouseDown = false;
 	bool didSwipe = false;
@@ -26,8 +28,11 @@ public class NinjaInput : MonoBehaviour {
 		Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
 
 		var deltaPos = Input.mousePosition - screenPos;
+
+		deltaPos = Input.mousePosition - downMousePos;
 		swipeDir = deltaPos.normalized;
 		//Unit Vector of change in position
+		swipeDistance = deltaPos.magnitude;
 		swipeSpeed = deltaPos.magnitude / downTime;
 		//distance traveled divided by time elapsed
 	}
@@ -39,25 +44,29 @@ public class NinjaInput : MonoBehaviour {
 
 	void CheckSwipe (bool allowSwipeFire = false)
 	{
-		if (downTime >= minSwipeTime) {
-			UpdateSwipeData ();
+		UpdateSwipeData ();
 
-			if (allowSwipeFire) {
-				FireSwipeEvent ();
-			}
+		if (IsSwiping() && allowSwipeFire) {
+			FireSwipeEvent ();
 		}
+	}
+
+	bool IsSwiping(){
+		return swipeDistance >= 30;
 	}
 
 	void Update () {
 
 		if (Input.GetMouseButtonDown(0)){
 			isMouseDown = true;
+			downMousePos = Input.mousePosition;
+
 		}
 
 		else if (Input.GetMouseButtonUp(0) && isMouseDown){
 			isMouseDown = false;
 
-			if (downTime < minSwipeTime){
+			if (!IsSwiping()){
 				TapEvent(new Vector2(Input.mousePosition.x, Input.mousePosition.y));					
 			}else{
 				if (!didSwipe)
@@ -74,13 +83,12 @@ public class NinjaInput : MonoBehaviour {
 				downTime += Time.deltaTime;
 
 				if (!didSwipe){
-					
-					if (downTime >= minSwipeTime){
-						var currPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);					
-						SwipeUpdatedEvent(currPos);
-					}
 
 					CheckSwipe(downTime > maxSwipeTime);
+
+					if (IsSwiping()){
+						SwipeUpdatedEvent(downMousePos, Input.mousePosition);
+					}
 				}
 					
 			}

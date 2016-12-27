@@ -31,15 +31,17 @@ public class EnemyNinjaController : NinjaController{
 	void ThrowStars(){
 		PauseMove();
 
-		var numStars = Random.Range(1, 5);
+		StartThrowAnimation(true);
 
-		var throwGap = 0.3f;
+		var numStars = Random.Range(1, 4);
+
+		var throwGap = 0.4f;
 
 		for(int i = 0; i < numStars; i++){
-			LeanTween.delayedCall(gameObject, (i * throwGap), RandomDirectionStarThrow);
+			LeanTween.delayedCall(gameObject, (i * throwGap), ()=>ThrowRandomDirectionStar(-throwSpeed));
 		}
 
-		LeanTween.delayedCall(gameObject, throwGap * numStars + 0.2f,() => {
+		LeanTween.delayedCall(gameObject, throwGap * numStars + 0.5f,() => {
 			ResumeMove();
 			DelayThrowStar();
 		} );
@@ -67,7 +69,7 @@ public class EnemyNinjaController : NinjaController{
 				var numStars = Random.Range(1, 4);
 
 				for (int i = 0; i < numStars; i++) {
-					RandomDirectionStarThrow();
+					ThrowRandomDirectionStar(-throwSpeed);
 
 					if (i == 0){
 						//PauseMove();
@@ -80,11 +82,6 @@ public class EnemyNinjaController : NinjaController{
 				//ResumeMove();
 			}
 		}
-	}
-
-	void RandomDirectionStarThrow(){
-		var direction = new Vector2(Random.Range(0.1f, 1f), Random.Range(0.1f, 1f));
-		ThrowStar(direction, -throwSpeed);
 	}
 
 	public override void Pause ()

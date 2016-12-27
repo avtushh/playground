@@ -18,6 +18,12 @@ public class MoveHoriz : MonoBehaviour {
 
 	bool _paused;
 
+	public bool IsPaused {
+		get {
+			return _paused;
+		}
+	}
+
 	float _right, _left;
 
 	void Start () {
@@ -34,6 +40,7 @@ public class MoveHoriz : MonoBehaviour {
 	}
 
 	public void Resume(){
+		_paused = false;
 		Move();
 	}
 
@@ -99,4 +106,6 @@ public class MoveHoriz : MonoBehaviour {
 			MoveLeft ();
 		}
 	}
+
+
 }

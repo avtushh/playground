@@ -74,8 +74,8 @@ public class NinjaGameManager : MonoBehaviour {
 	IEnumerator ShowObstaclesOnInitRoundCoro(){
 	
 		for (int i = 0; i < obstacleGroups.Count; i++) {
+			yield return new WaitForSeconds(0.2f);
 			obstacleGroups[i].gameObject.SetActive(true);
-			yield return new WaitForSeconds(0.3f);
 		}
 
 		ShowNextRound();
@@ -167,14 +167,14 @@ public class NinjaGameManager : MonoBehaviour {
 		ShowWinText();
 	}
 
-	void Player_HitEvent (int lives, NinjaStar obj)
+	void Player_HitEvent (NinjaStar obj)
 	{
 		enemyScore++;
 
 		OnHit (player);
 	}
 
-	void Enemy_HitEvent (int lives, NinjaStar obj)
+	void Enemy_HitEvent (NinjaStar obj)
 	{
 		playerScore++;
 
