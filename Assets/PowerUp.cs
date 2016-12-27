@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class PowerUp : MonoBehaviour
 {
@@ -22,7 +23,11 @@ public class PowerUp : MonoBehaviour
 
 	void Awake ()
 	{
+		List<PowerupType> types = new List<PowerupType>(){PowerupType.Shield, PowerupType.Shield, PowerupType.Split, PowerupType.Split, PowerupType.Split, PowerupType.FireBall};
+
 		type = EnumUtils.RandomEnumValue<PowerupType> (true);
+
+		type = types[UnityEngine.Random.Range(0, types.Count)];
 
 		_sprRenderer = GetComponent<SpriteRenderer> ();
 
@@ -41,7 +46,7 @@ public class PowerUp : MonoBehaviour
 		LeanTween.moveY (gameObject, transform.position.y * 1.05f, 0.5f).setEase (LeanTweenType.easeInOutSine).setLoopPingPong ();
 	}
 
-	void OnTriggerExit2D (Collider2D other)
+	void OnTriggerEnter2D (Collider2D other)
 	{
 		if (other.tag == "Bullet") {
 			var ninjaStar = other.gameObject.GetComponent<NinjaStar> ();

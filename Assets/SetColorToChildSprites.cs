@@ -15,7 +15,7 @@ public class SetColorToChildSprites : MonoBehaviour {
 			color = GetRandomColor();
 
 		for (int i = 0; i < sprites.Length; i++) {
-			sprites[i].color = color;
+			sprites[i].color = GetRandomColor();
 		}
 	}
 

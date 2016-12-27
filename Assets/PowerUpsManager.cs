@@ -11,7 +11,7 @@ public class PowerUpsManager : MonoBehaviour {
 
 	public GameObject powerupPrefab; 
 
-	public int baseDelay = 10;
+	public int baseDelay = 8;
 	public int variantDelay = 5;
 
 	public void Pause(){

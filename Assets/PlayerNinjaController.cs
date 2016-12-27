@@ -1,21 +1,24 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlayerNinjaController : NinjaController{
+public class PlayerNinjaController : NinjaController
+{
 	
 	public NinjaInput touchInput;
 	public LineRenderer swipeLine;
 
-	protected override void RemoveListeners(){
-		base.RemoveListeners();
+	protected override void RemoveListeners ()
+	{
+		base.RemoveListeners ();
 		touchInput.TapEvent -= TouchInput_OnTap;
 		touchInput.SwipeDoneEvent -= TouchInput_OnSwipeRelease;
 		touchInput.SwipeUpdatedEvent -= TouchInput_OnSwiping;
 		touchInput.MouseUpEvent -= TouchInput_OnMouseUp;
 	}
 
-	protected override void AddListeners(){
-		base.AddListeners();
+	protected override void AddListeners ()
+	{
+		base.AddListeners ();
 		touchInput.TapEvent += TouchInput_OnTap;
 		touchInput.SwipeDoneEvent += TouchInput_OnSwipeRelease;
 		touchInput.SwipeUpdatedEvent += TouchInput_OnSwiping;
@@ -35,7 +38,7 @@ public class PlayerNinjaController : NinjaController{
 			return;
 		
 		swipeLine.enabled = false;
-		moveHoriz.SwitchDirection();
+		moveHoriz.SwitchDirection ();
 	}
 
 	void TouchInput_OnMouseUp (Vector3 obj)
@@ -43,7 +46,7 @@ public class PlayerNinjaController : NinjaController{
 		if (isPaused || isHit)
 			return;
 		
-		moveHoriz.Resume();
+		moveHoriz.Resume ();
 		swipeLine.enabled = false;
 	}
 
@@ -56,12 +59,12 @@ public class PlayerNinjaController : NinjaController{
 		if (isPaused || _isThrowing || isHit)
 			return;
 
-		if (!canThrow()){
+		if (!canThrow ()) {
 			return;
 		}
 													
-		var endPoint = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y));
-		var startPoint = Camera.main.ScreenToWorldPoint(new Vector3(downMousePos.x, downMousePos.y));
+		var endPoint = Camera.main.ScreenToWorldPoint (new Vector3 (mousePos.x, mousePos.y));
+		var startPoint = Camera.main.ScreenToWorldPoint (new Vector3 (downMousePos.x, downMousePos.y));
 
 		var playerPoint = transform.position;
 
@@ -72,19 +75,17 @@ public class PlayerNinjaController : NinjaController{
 
 		ShowDirectionLine (playerPoint, endPoint);
 
-		moveHoriz.Pause();
+		moveHoriz.Pause ();
 
-		if (endPoint.x < transform.position.x){
-			//if (!moveHoriz.IsLeft)
-				moveHoriz.TurnLeft();
-		}else{
-			//if (moveHoriz.IsLeft)
-				moveHoriz.TurnRight();
+		if (endPoint.x < transform.position.x) {
+			moveHoriz.TurnLeft ();
+		} else {
+			moveHoriz.TurnRight ();
 		}
 
-		if (!_isSwiping){
+		if (!_isSwiping) {
 			_isSwiping = true;
-			StartThrowAnimation();
+			StartThrowAnimation ();
 		}
 	}
 
@@ -93,7 +94,7 @@ public class PlayerNinjaController : NinjaController{
 		if (isPaused || _isThrowing || isHit)
 			return;
 
-		if (!canThrow()){
+		if (!canThrow ()) {
 			return;
 		}
 
@@ -108,14 +109,15 @@ public class PlayerNinjaController : NinjaController{
 		_isThrowing = true;
 
 		ThrowStar (normalizedSwipeDir, throwSpeed);
-		EndThrowAnimation();
+		EndThrowAnimation ();
 		LeanTween.delayedCall (gameObject, 0.2f, EndThrow);
 	}
 
-	void EndThrow(){
+	void EndThrow ()
+	{
 		
 		_isThrowing = false;
-		ResumeMove();
+		ResumeMove ();
 	}
 
 	void ShowDirectionLine (Vector3 startpoint, Vector3 endPoint)
@@ -123,7 +125,7 @@ public class PlayerNinjaController : NinjaController{
 		swipeLine.enabled = true;
 		swipeLine.SetVertexCount (2);
 		swipeLine.SetWidth (0.2f, 0.2f);
-		swipeLine.SetColors(Color.yellow, Color.yellow);
+		swipeLine.SetColors (Color.yellow, Color.yellow);
 		swipeLine.SetPosition (0, new Vector3 (startpoint.x, startpoint.y, transform.position.z + 1));
 		swipeLine.SetPosition (1, new Vector3 (endPoint.x, endPoint.y, transform.position.z + 1));
 	}

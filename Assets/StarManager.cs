@@ -74,8 +74,12 @@ public class StarManager : MonoBehaviour {
 		while (true){
 			if (!_paused){
 
-				if (FindObjectsOfType<NinjaStar>().Length <= 2){
-					CreateInitialStarsOnGround();
+				if (player.ActiveStarsCount == 0 && _playerStarsOnGround.Count == 0){
+					AddPlayerStarOnGround();
+				}
+
+				if (enemy.ActiveStarsCount == 0 && _enemyStarsOnGround.Count == 0){
+					AddEnemyStarOnGround();
 				}
 
 				yield return new WaitForSeconds(0.5f);

@@ -12,6 +12,8 @@ public class NinjaController : MonoBehaviour {
 
 	public GameObject shield;
 
+	public Transform starHolder;
+
 	public float throwSpeed = 10f;
 
 	public bool isPaused = false;
@@ -56,6 +58,8 @@ public class NinjaController : MonoBehaviour {
 
 		if (other.gameObject.CompareTag("Bullet")){
 
+
+
 			var star = other.gameObject.GetComponent<NinjaStar>();
 
 			if (star == null){
@@ -69,10 +73,17 @@ public class NinjaController : MonoBehaviour {
 				if (star.tagToHit == gameObject.tag){
 					//Debug.LogError("Hit " + star.tagToHit);
 					star.Hit();
-					isHit = true;
-					HitEvent(star);
+					if (!shield.activeInHierarchy){
+						isHit = true;
+						HitEvent(star);	
+					}else{
+						ToggleShield(false);
+					}
+
 				}else{
-					//PickUpStar (star);
+					float velY = star.GetYVelocity();
+					if ((star.IsPlayerStar && velY < 0) || (!star.IsPlayerStar && velY > 0))
+						PickUpStar (star);
 				}
 			}else{
 				PickUpStar (star);
@@ -83,8 +94,8 @@ public class NinjaController : MonoBehaviour {
 	void PickUpStar (NinjaStar star)
 	{
 		star.Pickup ();
-		star.transform.position = transform.position;
-		star.transform.SetParent (icon.transform, true);
+		star.transform.position = starHolder.position;
+		star.transform.SetParent (starHolder, true);
 		activeStars.Add (star);
 		PickUpStarEvent (star);
 	}
@@ -121,6 +132,7 @@ public class NinjaController : MonoBehaviour {
 
 	public void Init(){
 		Pause();
+		isHit = false;
 
 	}
 

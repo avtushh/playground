@@ -9,6 +9,10 @@ public static class NinjaTags{
 }
 
 public class NinjaStar : MonoBehaviour {
+	public float GetYVelocity ()
+	{
+		return _rigidBody.velocity.y;
+	}
 
 	Rigidbody2D _rigidBody;
 	public Sprite fireballSprite;
@@ -143,12 +147,18 @@ public class NinjaStar : MonoBehaviour {
 		isGrounded = true;
 
 		normalCollider.isTrigger = true;
+
+		LeanTween.moveY (gameObject, transform.position.y * 1.005f, 0.1f).setEase (LeanTweenType.easeInOutSine).setLoopPingPong ();
 	}
 
 	public void Pickup ()
 	{
+		_rigidBody.velocity = Vector2.zero;
+		_rigidBody.angularVelocity = 0;
+
 		isGrounded = false;
 		normalCollider.enabled = false;
+		LeanTween.cancel(gameObject);
 	}
 
 	public void Throw(Vector2 velocity){
