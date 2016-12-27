@@ -31,6 +31,8 @@ public class NinjaGameManager : MonoBehaviour {
 	public PowerUpsManager powerupManager;
 	public StarManager starManager;
 
+	public static bool isPaused = false;
+
 	void Start(){
 
 		scoreStr = scoreText.text;
@@ -149,6 +151,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 	void Pause ()
 	{
+		isPaused = true;
 		enemy.Pause ();
 		player.Pause ();
 		powerupManager.Pause();
@@ -156,6 +159,7 @@ public class NinjaGameManager : MonoBehaviour {
 	}
 
 	void Resume(){
+		isPaused = false;
 		enemy.Resume();
 		player.Resume();
 		powerupManager.Resume();

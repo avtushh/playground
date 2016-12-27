@@ -20,7 +20,7 @@ public class StarManager : MonoBehaviour {
 
 	public void Clear(){
 		var starsList = FindObjectsOfType<NinjaStar>().ToList();
-		starsList.ForEach(Destroy);
+		starsList.ForEach(x => Object.Destroy(x.gameObject));
 		starsList.Clear();
 	}
 
@@ -60,7 +60,6 @@ public class StarManager : MonoBehaviour {
 
 	void CreateInitialStarsOnGround ()
 	{
-
 		for (int i = 0; i < initPlayerStars; i++) {
 			AddPlayerStarOnGround();
 		}
@@ -76,11 +75,12 @@ public class StarManager : MonoBehaviour {
 			if (!_paused){
 
 				if (FindObjectsOfType<NinjaStar>().Length <= 2){
-					AddPlayerStarOnGround ();
-					AddEnemyStarOnGround ();
+					CreateInitialStarsOnGround();
 				}
 
 				yield return new WaitForSeconds(0.5f);
+			}else{
+				yield return null;
 			}
 		}
 	}
@@ -103,6 +103,8 @@ public class StarManager : MonoBehaviour {
 
 		var starGo = Instantiate (starPrefab, pos, Quaternion.identity) as GameObject;
 		var star = starGo.GetComponent<NinjaStar> ();
+		star.IsFireball = false;
+		star.isGrounded = true;
 
 		return star;
 	}

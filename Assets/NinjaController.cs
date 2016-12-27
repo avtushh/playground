@@ -18,6 +18,8 @@ public class NinjaController : MonoBehaviour {
 
 	public bool isThrowing = false;
 
+	public bool isHit = false;
+
 	public int powerupDuration;
 
 	public Vector3 orgScale;
@@ -28,7 +30,7 @@ public class NinjaController : MonoBehaviour {
 
 	float _powerUpTime;
 
-	protected List<NinjaStar> activeStars;
+	protected List<NinjaStar> activeStars = new List<NinjaStar>();
 
 	public event Action<NinjaStar> HitEvent = (star) => {};
 	public event Action<NinjaStar> ThrowStarEvent = (star) => {};
@@ -49,18 +51,26 @@ public class NinjaController : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D other) {
 
-		if (isPaused)
+		if (isPaused || isHit)
 			return;
 
 		if (other.gameObject.CompareTag("Bullet")){
 
 			var star = other.gameObject.GetComponent<NinjaStar>();
 
+			if (star == null){
+				star = other.GetComponentInParent<NinjaStar>();
+			}
+
+			if (star == null)
+				return;
+
 			if (!star.isGrounded){
 				if (star.tagToHit == gameObject.tag){
 					//Debug.LogError("Hit " + star.tagToHit);
-					HitEvent(star);
 					star.Hit();
+					isHit = true;
+					HitEvent(star);
 				}else{
 					//PickUpStar (star);
 				}
@@ -111,7 +121,7 @@ public class NinjaController : MonoBehaviour {
 
 	public void Init(){
 		Pause();
-		activeStars = new List<NinjaStar>();
+
 	}
 
 	protected virtual void AddListeners(){
@@ -126,11 +136,15 @@ public class NinjaController : MonoBehaviour {
 		isPaused = true;
 		PauseMove();
 		ToggleShield(false);
+		activeStars = new List<NinjaStar>();
+		LeanTween.cancel(gameObject);
 	}
 
 	public virtual void Resume(){
 		orgScale = icon.transform.localScale;
 		isPaused = false;
+		isHit = false;
+		isThrowing = false;
 		ResumeMove();
 	}
 
@@ -185,7 +199,7 @@ public class NinjaController : MonoBehaviour {
 	}
 
 	NinjaStar DequeueStar(){
-		var star = activeStars.First();
+		var star = activeStars.Last();
 		star.SetTarget(tagToHit);
 		star.transform.SetParent(null);
 		activeStars.Remove(star);

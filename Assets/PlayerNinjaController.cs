@@ -31,7 +31,7 @@ public class PlayerNinjaController : NinjaController{
 
 	void TouchInput_OnTap (Vector2 obj)
 	{
-		if (isPaused)
+		if (isPaused || isHit)
 			return;
 		
 		swipeLine.enabled = false;
@@ -40,7 +40,7 @@ public class PlayerNinjaController : NinjaController{
 
 	void TouchInput_OnMouseUp (Vector3 obj)
 	{
-		if (isPaused)
+		if (isPaused || isHit)
 			return;
 		
 		moveHoriz.Resume();
@@ -53,7 +53,7 @@ public class PlayerNinjaController : NinjaController{
 
 	void TouchInput_OnSwiping (Vector3 downMousePos, Vector3 mousePos)
 	{
-		if (isPaused || _isThrowing)
+		if (isPaused || _isThrowing || isHit)
 			return;
 
 		if (!canThrow()){
@@ -90,7 +90,7 @@ public class PlayerNinjaController : NinjaController{
 
 	void TouchInput_OnSwipeRelease (Vector2 normalizedSwipeDir, float swipeSpeed)
 	{
-		if (isPaused || _isThrowing)
+		if (isPaused || _isThrowing || isHit)
 			return;
 
 		if (!canThrow()){
@@ -109,7 +109,7 @@ public class PlayerNinjaController : NinjaController{
 
 		ThrowStar (normalizedSwipeDir, throwSpeed);
 		EndThrowAnimation();
-		LeanTween.delayedCall (0.2f, EndThrow);
+		LeanTween.delayedCall (gameObject, 0.2f, EndThrow);
 	}
 
 	void EndThrow(){

@@ -33,19 +33,22 @@ public class NinjaStar : MonoBehaviour {
 			_isFireball = value;
 			if (_isFireball){
 				spriteRenderer.sprite = fireballSprite;
-				fireBall.SetActive(true);
 			}
+			fireBall.SetActive(value);
 		}
 	}
 
 	void Awake () {
 		_rigidBody = GetComponent<Rigidbody2D>();
-		IsFireball = false;
 		_orgScale = transform.localScale;
-		fireBall.SetActive(false);
 	}
 
 	void Update(){
+
+		if (NinjaGameManager.isPaused){
+			return;
+		}
+
 		if (!isGrounded && _rigidBody.velocity.magnitude < 0.5f && transform.parent == null){
 			ThrowRandomDirection(10);
 		}
@@ -53,6 +56,9 @@ public class NinjaStar : MonoBehaviour {
 
 	public void SetTarget(string targetTag){
 		tagToHit = targetTag;
+
+		if (IsFireball)
+			return;
 
 		if (IsPlayerStar){
 			spriteRenderer.sprite = sprBlack;
@@ -123,6 +129,7 @@ public class NinjaStar : MonoBehaviour {
 		var go = Instantiate (gameObject, transform.position, Quaternion.identity) as GameObject;
 		var star = go.GetComponent<NinjaStar> ();
 		star.IsFireball = IsFireball;
+		star.isGrounded = false;
 		star.SetTarget(star.tagToHit);
 		Vector2 velocity = Quaternion.Euler (0, angle, 0) * _rigidBody.velocity;
 		star.Throw (velocity);
@@ -152,10 +159,6 @@ public class NinjaStar : MonoBehaviour {
 		normalCollider.enabled = true;
 		normalCollider.isTrigger = false;
 		transform.localScale = _orgScale;
-
-		if (IsFireball){
-			normalCollider.isTrigger = true; 
-		}
 	}
 
 	public void ThrowRandomDirection(float speed){
@@ -169,3 +172,4 @@ public class NinjaStar : MonoBehaviour {
 
 
 }
+
