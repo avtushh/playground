@@ -49,6 +49,9 @@ public class PowerUpsManager : MonoBehaviour {
 	{
 		float x = Random.Range(_boardBounds.xMin, _boardBounds.xMax);
 		float y = Random.Range(_boardBounds.yMin, _boardBounds.yMax);
+
+		FindObjectsOfType<ObstacleUnit>();
+
 		var go = Instantiate(powerupPrefab, new Vector3(x, y, left.position.z ), Quaternion.identity) as GameObject;
 
 		_currentPowerUp = go.GetComponent<PowerUp>();

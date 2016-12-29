@@ -60,7 +60,6 @@ public class NinjaInput : MonoBehaviour {
 		if (Input.GetMouseButtonDown(0)){
 			isMouseDown = true;
 			downMousePos = Input.mousePosition;
-
 		}
 
 		else if (Input.GetMouseButtonUp(0) && isMouseDown){
@@ -94,12 +93,12 @@ public class NinjaInput : MonoBehaviour {
 			}
 		}
 
-		if (Input.touchCount > 0){
-			if(Input.touches[0].phase == TouchPhase.Moved)//Check if Touch has moved.
-			{
-				swipeDir = Input.touches[0].deltaPosition.normalized;  //Unit Vector of change in position
-				swipeSpeed = Input.touches[0].deltaPosition.magnitude / Input.touches[0].deltaTime; //distance traveled divided by time elapsed
-			}
-		}
+//		if (Input.touchCount > 0){
+//			if(Input.touches[0].phase == TouchPhase.Moved)//Check if Touch has moved.
+//			{
+//				swipeDir = Input.touches[0].deltaPosition.normalized;  //Unit Vector of change in position
+//				swipeSpeed = Input.touches[0].deltaPosition.magnitude / Input.touches[0].deltaTime; //distance traveled divided by time elapsed
+//			}
+//		}
 	}
 }

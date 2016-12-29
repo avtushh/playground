@@ -13,7 +13,7 @@ public class EnemyNinjaController : NinjaController{
 		//Init ();
 	}
 
-	void Init ()
+	void StartAI ()
 	{
 		moveHoriz.MoveRight ();
 
@@ -62,44 +62,10 @@ public class EnemyNinjaController : NinjaController{
 		}
 	}
 
-	IEnumerator ThrowCoro(){
-		while(true){
-			if (!isPaused){
-				
-				var delay = Random.Range(minFreq, maxFreq);
-				yield return new WaitForSeconds(delay);
-
-				isThrowing = true;
-
-				var numStars = Random.Range(1, 4);
-
-				for (int i = 0; i < numStars; i++) {
-					ThrowRandomDirectionStar(-throwSpeed);
-
-					if (i == 0){
-						//PauseMove();
-					}
-					yield return new WaitForSeconds(delayBetweenStars);
-				}
-
-				isThrowing = false;
-
-				//ResumeMove();
-			}
-		}
-	}
-
-	public override void Pause ()
-	{
-		base.Pause ();
-		StopAllCoroutines();
-		LeanTween.cancel(gameObject);
-	}
-
 	public override void Resume ()
 	{
 		base.Resume ();
-		Init ();
+		StartAI ();
 	}
 
 

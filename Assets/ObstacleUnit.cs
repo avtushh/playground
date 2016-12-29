@@ -19,10 +19,14 @@ public class ObstacleUnit : MonoBehaviour {
 
 	public static List<Color> RandomColors;
 
-	void Start(){
+	void Awake(){
 		_spriteRenderer = GetComponent<SpriteRenderer> ();
 		_orgColor = _spriteRenderer.color;
 		_collider = GetComponent<Collider2D>();
+	}
+
+	void Start(){
+		
 		LeanTween.delayedCall(Random.Range(0.1f, 0.5f), MoveUpDown);
 	}
 
@@ -74,7 +78,7 @@ public class ObstacleUnit : MonoBehaviour {
 
 	void UpdatePoints ()
 	{
-		initHitPoints = Random.Range (1, 10);
+		initHitPoints = Random.Range (1, 5);
 		_hitpoints = initHitPoints;
 		UpdateHitpointsText ();
 		_collider.enabled = true;

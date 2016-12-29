@@ -130,7 +130,7 @@ public class NinjaController : MonoBehaviour {
 
 	#region lifecycle
 
-	public void Init(){
+	public virtual void Init(){
 		Pause();
 		isHit = false;
 
@@ -150,6 +150,7 @@ public class NinjaController : MonoBehaviour {
 		ToggleShield(false);
 		activeStars = new List<NinjaStar>();
 		LeanTween.cancel(gameObject);
+		StopAllCoroutines();
 	}
 
 	public virtual void Resume(){
