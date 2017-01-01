@@ -53,8 +53,11 @@ public class NinjaStar : MonoBehaviour {
 			return;
 		}
 
-		if (!isGrounded && _rigidBody.velocity.magnitude < 0.5f && transform.parent == null){
-			ThrowRandomDirection(10);
+		if (!isGrounded && _rigidBody.velocity.magnitude < 4.5f && transform.parent == null){
+			if (_rigidBody.velocity.magnitude < 0.5f)
+				ThrowRandomDirection(15);
+			else
+				_rigidBody.velocity *= 5f;
 		}
 	}
 
@@ -181,5 +184,16 @@ public class NinjaStar : MonoBehaviour {
 	}
 
 
+	public void ThrowAt (float throwSpeed, Vector3 pos)
+	{
+		var deltaPos = transform.position - pos;
+
+		var direction = deltaPos.normalized;
+
+		var throwXSpeed = direction.x * throwSpeed;
+		var throwYSpeed = direction.y * throwSpeed;
+
+		Throw(new Vector2(throwXSpeed, throwYSpeed));
+	}
 }
 

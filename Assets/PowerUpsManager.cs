@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class PowerUpsManager : MonoBehaviour {
 	
@@ -45,17 +47,39 @@ public class PowerUpsManager : MonoBehaviour {
 		}
 	}
 
+	bool CollidesWithObstacles(Vector3 pos){
+
+		var obstacles =	GameObject.FindGameObjectsWithTag("Obstacle").ToList();
+
+		var collidedObstacle = obstacles.FirstOrDefault(obs => obs.GetComponent<Collider2D>().bounds.Contains(pos));
+
+		return collidedObstacle != null;
+	}
+
 	void CreateRandomPowerUp ()
 	{
-		float x = Random.Range(_boardBounds.xMin, _boardBounds.xMax);
-		float y = Random.Range(_boardBounds.yMin, _boardBounds.yMax);
+		int creationAttempts = 0;
 
-		FindObjectsOfType<ObstacleUnit>();
+		while (creationAttempts < 5){
+			
+			float x = Random.Range(_boardBounds.xMin, _boardBounds.xMax);
+			float y = Random.Range(_boardBounds.yMin, _boardBounds.yMax);
 
-		var go = Instantiate(powerupPrefab, new Vector3(x, y, left.position.z ), Quaternion.identity) as GameObject;
+			Vector3 createPos = new Vector3(x,y,left.position.z);
 
-		_currentPowerUp = go.GetComponent<PowerUp>();
-		_currentPowerUp.HitEvent += _currentPowerUp_HitEvent;
+			if (CollidesWithObstacles(createPos)){
+				creationAttempts++;
+			}else{
+				var go = Instantiate(powerupPrefab, new Vector3(x, y, left.position.z ), Quaternion.identity) as GameObject;
+
+				_currentPowerUp = go.GetComponent<PowerUp>();
+				_currentPowerUp.HitEvent += _currentPowerUp_HitEvent;	
+				return;
+			}
+
+
+		}
+
 	}
 
 	void _currentPowerUp_HitEvent ()

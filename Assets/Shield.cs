@@ -29,8 +29,11 @@ public class Shield : MonoBehaviour {
 
 			var star = other.gameObject.GetComponent<NinjaStar>();
 
-			if (!star.IsPlayerStar)
+			if (!star.IsPlayerStar && star.isGrounded == false){
 				gameObject.SetActive(false);
+				star.Hit();
+			}
+			
 			
 		}
 	}

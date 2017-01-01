@@ -52,14 +52,12 @@ public class NinjaController : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D other) {
-
+		
 		if (isPaused || isHit)
 			return;
 
 		if (other.gameObject.CompareTag("Bullet")){
-
-
-
+			
 			var star = other.gameObject.GetComponent<NinjaStar>();
 
 			if (star == null){
@@ -208,6 +206,12 @@ public class NinjaController : MonoBehaviour {
 	public NinjaStar ThrowRandomDirectionStar(float throwSpeed){
 		var star = DequeueStar();
 		star.ThrowRandomDirection(throwSpeed);
+		return star;
+	}
+
+	public NinjaStar ThrowAt(Vector3 pos){
+		var star = DequeueStar();
+		star.ThrowAt(throwSpeed, pos);
 		return star;
 	}
 

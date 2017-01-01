@@ -10,5 +10,15 @@ public static class TransformExtensions {
 		}
 		return transform;
 	}
+
+	public static void SetPositionX(this Transform transform, float x)
+	{
+		var pos = transform.position;
+
+		pos.x = x;
+
+		transform.position = pos;
+	}
+
 	
 }

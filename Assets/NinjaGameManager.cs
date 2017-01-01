@@ -12,9 +12,6 @@ public class NinjaGameManager : MonoBehaviour {
 
 	public List<TweenStartRoundAnimation> roundAnimations = new List<TweenStartRoundAnimation>();
 
-	public List<ObstacleUnit> obstacles = new List<ObstacleUnit>();
-	public List<ObstacleGroup> obstacleGroups = new List<ObstacleGroup>();
-
 	public GameObject messagePanel;
 	public Text scoreText;
 
@@ -30,6 +27,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 	public PowerUpsManager powerupManager;
 	public StarManager starManager;
+	public ObstaclesManager obstaclesManager;
 
 	public static bool isPaused = false;
 
@@ -38,10 +36,6 @@ public class NinjaGameManager : MonoBehaviour {
 		scoreStr = scoreText.text;
 
 		AddListeners ();
-
-		obstacles = FindObjectsOfType<ObstacleUnit>().ToList();
-		if (obstacleGroups.Count() == 0)
-			obstacleGroups = FindObjectsOfType<ObstacleGroup>().ToList();
 
 		InitGame ();
 	}
@@ -56,6 +50,23 @@ public class NinjaGameManager : MonoBehaviour {
 			x.CompleteEvent += OnStartRoundAnimationComplete;
 		});
 		playAgainButton.onClick.AddListener(InitGame);
+	}
+
+	void RemoveListeners(){
+		player.HitEvent -= Player_HitEvent;
+		enemy.HitEvent -= Enemy_HitEvent;
+		enemy.ThrowStarEvent -= OnThrowStar;
+		player.ThrowStarEvent -= OnThrowStar;
+		roundAnimations.ForEach (x =>  {
+			x.CompleteEvent -= OnStartRoundAnimationComplete;
+		});
+		playAgainButton.onClick.RemoveListener(InitGame);
+
+		LeanTween.cancel(gameObject);
+	}
+
+	void OnDestroy(){
+		RemoveListeners();
 	}
 
 	void OnThrowStar (NinjaStar obj)
@@ -74,21 +85,15 @@ public class NinjaGameManager : MonoBehaviour {
 
 		powerupManager.Pause();
 		currentRound = 0;
-		obstacleGroups.ForEach(x => x.gameObject.SetActive(false));
-		obstacles.ForEach(x => x.gameObject.SetActive(true));
 		starManager.Clear();
-		StartCoroutine(ShowObstaclesOnInitRoundCoro());
 
-
+		LeanTween.delayedCall(gameObject, 0.5f, () => StartCoroutine(ShowObstaclesOnInitRoundCoro()));
 	}
 
 	IEnumerator ShowObstaclesOnInitRoundCoro(){
 	
-		for (int i = 0; i < obstacleGroups.Count; i++) {
-			yield return new WaitForSeconds(0.2f);
-			obstacleGroups[i].gameObject.SetActive(true);
-		}
-
+		obstaclesManager.ActivateObstaclesGroupByType();
+		yield return new WaitForSeconds(1f);
 		ShowNextRound();
 	}
 
@@ -99,7 +104,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 	void OnStartRoundAnimationComplete ()
 	{
-		LeanTween.delayedCall(1f, () => {
+		LeanTween.delayedCall(gameObject, 1f, () => {
 			roundAnimations[currentRound].gameObject.SetActive(false);
 			StartNextRound();
 		});
@@ -120,7 +125,7 @@ public class NinjaGameManager : MonoBehaviour {
 		starManager.Clear();
 		hitNinja.ShowHitAnimation(hitAnimationTime);
 
-		LeanTween.delayedCall(hitAnimationTime, () => {
+		LeanTween.delayedCall(gameObject, hitAnimationTime, () => {
 			ShowHitText();
 
 			if (playerScore >= 2){

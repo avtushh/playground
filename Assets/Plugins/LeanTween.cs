@@ -226,6 +226,7 @@ public enum LeanTweenType{
 * @constructor
 */
 
+[Serializable]
 public class LTDescr {
 	public bool toggle;
 	public bool useEstimatedTime;
@@ -274,6 +275,7 @@ public class LTDescr {
 	public object onCompleteParam;
 	public object onUpdateParam;
 	public Action onStart;
+	public float ratioPassed;
 
 	#if LEANTWEEN_1
 	public Hashtable optional;
@@ -1444,6 +1446,7 @@ public static void update() {
 						ratioPassed = 1f;
 					}else{
 						ratioPassed = tween.passed / timeTotal;
+						tween.ratioPassed = ratioPassed;
 					}
 
 					if(ratioPassed>1.0f){
@@ -3993,7 +3996,7 @@ public static int alpha(GameObject gameObject, float to, float time, object[] op
 
 // Tweening Functions - Thanks to Robert Penner and GFX47
 
-private static float tweenOnCurve( LTDescr tweenDescr, float ratioPassed ){
+public static float tweenOnCurve( LTDescr tweenDescr, float ratioPassed ){
 	// Debug.Log("single ratio:"+ratioPassed+" tweenDescr.animationCurve.Evaluate(ratioPassed):"+tweenDescr.animationCurve.Evaluate(ratioPassed));
 	return tweenDescr.from.x + (tweenDescr.diff.x) * tweenDescr.animationCurve.Evaluate(ratioPassed);
 }

@@ -23,9 +23,7 @@ public class PowerUp : MonoBehaviour
 
 	void Awake ()
 	{
-		List<PowerupType> types = new List<PowerupType>(){PowerupType.Shield, PowerupType.Shield, PowerupType.Split, PowerupType.Split, PowerupType.Split, PowerupType.FireBall};
-
-		type = EnumUtils.RandomEnumValue<PowerupType> (true);
+		List<PowerupType> types = new List<PowerupType>(){PowerupType.Shield, PowerupType.Shield, PowerupType.Shield, PowerupType.Split, PowerupType.Split, PowerupType.Split, PowerupType.Split, PowerupType.Split, PowerupType.FireBall};
 
 		type = types[UnityEngine.Random.Range(0, types.Count)];
 

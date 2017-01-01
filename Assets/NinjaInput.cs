@@ -7,7 +7,10 @@ public class NinjaInput : MonoBehaviour {
 	public event Action<Vector3, Vector3> SwipeUpdatedEvent = (v1, v2) => {};
 	public event Action<Vector2> TapEvent = v => {};
 	public event Action<Vector2, float> SwipeDoneEvent = (v,f) => {};
-	public event Action<Vector3> MouseUpEvent = (v) => {};
+
+	public event Action<Vector3> MouseDownEvent = v1 => {};
+	public event Action<Vector3, Vector3> MouseUpEvent = (v1,v2) => {};
+	public event Action<Vector3, Vector3> MouseMoveEvent = (v1,v2) => {};
 
 	public Vector2 swipeDir;
 	public float swipeSpeed;
@@ -63,6 +66,9 @@ public class NinjaInput : MonoBehaviour {
 		}
 
 		else if (Input.GetMouseButtonUp(0) && isMouseDown){
+
+			MouseUpEvent(downMousePos, Input.mousePosition);
+
 			isMouseDown = false;
 
 			if (!IsSwiping()){
@@ -70,15 +76,17 @@ public class NinjaInput : MonoBehaviour {
 			}else{
 				if (!didSwipe)
 					CheckSwipe (true);
-				if (!didSwipe){
-					MouseUpEvent(Input.mousePosition);
-				}
+//				if (!didSwipe){
+//					MouseUpEvent(downMousePos, Input.mousePosition);
+//				}
 			}	
 
 			downTime = 0;
 			didSwipe = false;
 		}else{
 			if (isMouseDown){
+				MouseMoveEvent(downMousePos, Input.mousePosition);
+
 				downTime += Time.deltaTime;
 
 				if (!didSwipe){
