@@ -6,10 +6,17 @@ public class NinjaMenu : MonoBehaviour {
 
 	public Button btn;
 	public Dropdown dropDown;
+	public Toggle toggle;
+	public InputField inputField;
 
 	// Use this for initialization
 	void Start () {
 		btn.onClick.AddListener(GotoNextScene);
+		inputField.text = GameSettings.startingStars.ToString();
+	}
+
+	void OnValueChanged(string text){
+		GameSettings.startingStars = int.Parse(text);
 	}
 
 	void GotoNextScene(){
@@ -22,8 +29,18 @@ public class NinjaMenu : MonoBehaviour {
 		else
 			ObstaclesManager.initObstacleType = ObstaclesManager.ObstacleType.Wheels;
 
+
+		GameSettings.ShowAim = toggle.isOn;
+		GameSettings.startingStars = int.Parse(inputField.text);
+
 		UnityEngine.SceneManagement.SceneManager.LoadScene(1);
 	}
+
+	void OnShowAimToggleChanged(bool val){
+		GameSettings.ShowAim = val;
+
+	}
+
 
 	
 	// Update is called once per frame

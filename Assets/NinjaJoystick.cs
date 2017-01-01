@@ -54,12 +54,15 @@ public class NinjaJoystick : MonoBehaviour {
 			var touch = Input.GetTouch(0);
 			switch(touch.phase){
 				case TouchPhase.Began:
+					_isMouseDown = true;
 					InputManager_MouseDownEvent(new Vector3(touch.position.x, touch.position.y, 0));
 					break;
 				case TouchPhase.Moved:
+
 					InputManager_MouseMoveEvent(new Vector3(touch.position.x, touch.position.y, 0));
 					break;
 				case TouchPhase.Ended:
+					_isMouseDown = false;
 					InputManager_MouseUpEvent(new Vector3(touch.position.x, touch.position.y, 0));
 					break;
 			}
@@ -73,8 +76,9 @@ public class NinjaJoystick : MonoBehaviour {
 	void InputManager_MouseUpEvent (Vector3 currScreenPos)
 	{
 		if (_isSwiping){
-			_isSwiping = CheckSwipe(_startSwipePos, currScreenPos);
+			CheckSwipe(_startSwipePos, currScreenPos);
 			SwipeDoneEvent(swipeDir);
+			_isSwiping = false;
 		}
 	}
 
@@ -136,9 +140,9 @@ public class NinjaJoystick : MonoBehaviour {
 
 	void InputManager_MouseDownEvent (Vector3 downPos)
 	{
-		
-		_isMouseDown = true;
+
 		_startSwipePos = downPos;
+		_swipeStartTime = DateTime.Now;
 	}
 
 	bool InJoystickArea(Vector3 pos, bool screenPoint = false){

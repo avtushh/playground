@@ -171,7 +171,9 @@ public class PlayerNinjaController : NinjaController
 		var delta = startPoint - starPosition;
 		endPoint = endPoint - delta;
 		endPoint.z = starPosition.z;
-		ShowDirectionLine (starPosition, endPoint);
+
+		if (GameSettings.ShowAim)
+			ShowDirectionLine (starPosition, endPoint);
 		moveHoriz.Pause ();
 		if (endPoint.x < transform.position.x) {
 			moveHoriz.TurnLeft ();

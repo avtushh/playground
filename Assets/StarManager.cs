@@ -60,6 +60,7 @@ public class StarManager : MonoBehaviour {
 
 	void CreateInitialStarsOnGround ()
 	{
+		initPlayerStars = GameSettings.startingStars;
 		for (int i = 0; i < initPlayerStars; i++) {
 			AddPlayerStarOnGround();
 		}
