@@ -21,17 +21,17 @@ public class PowerUpsManager : MonoBehaviour {
 		if (_currentPowerUp != null){
 			Destroy(_currentPowerUp.gameObject);
 			_currentPowerUp = null;
+			StopAllCoroutines();
 		}
 	}
 
 	public void Resume(){
 		_paused = false;
+		StartCoroutine(CreatePowerUpsCoro());
 	}
 
 	void Start () {
 		_boardBounds = new Rect(left.position.x, bottom.position.y, right.position.x - left.position.x, top.position.y - bottom.position.y);
-
-		StartCoroutine(CreatePowerUpsCoro());
 	}
 
 	IEnumerator CreatePowerUpsCoro ()

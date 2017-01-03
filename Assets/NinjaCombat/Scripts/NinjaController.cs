@@ -126,7 +126,8 @@ public class NinjaController : MonoBehaviour {
 
 	void DisactivatePowerup ()
 	{
-		ToggleShield(false);
+		if (activePowerup == PowerUp.PowerupType.Shield)
+			ToggleShield(false);
 		activePowerup = PowerUp.PowerupType.None;
 	}
 
@@ -222,7 +223,18 @@ public class NinjaController : MonoBehaviour {
 	}
 
 	NinjaStar DequeueStar(){
-		var star = activeStars.Last();
+
+
+		NinjaStar star;
+
+		var fireballStar = activeStars.FirstOrDefault(x => x.IsFireball);
+
+		if (fireballStar != null){
+			star = fireballStar;
+		}else{
+			star = activeStars.Last();
+		}
+
 		star.SetTarget(tagToHit);
 		star.transform.SetParent(null);
 		activeStars.Remove(star);

@@ -131,7 +131,7 @@ public class ObstacleUnit : MonoBehaviour {
 
 		spriteRenderer.color = c;
 
-		LeanTween.delayedCall(0.1f, () => spriteRenderer.color = _orgColor);
+		LeanTween.delayedCall(gameObject, 0.1f, () => spriteRenderer.color = _orgColor);
 		
 	}
 }

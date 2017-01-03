@@ -27,8 +27,6 @@ public class PowerUp : MonoBehaviour
 
 		type = types[UnityEngine.Random.Range(0, types.Count)];
 
-		type = PowerupType.FireBall;
-
 		_sprRenderer = GetComponent<SpriteRenderer> ();
 
 		switch (type) {
