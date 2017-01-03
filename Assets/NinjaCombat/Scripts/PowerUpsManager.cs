@@ -8,7 +8,7 @@ public class PowerUpsManager : MonoBehaviour {
 	public Transform left, right, top, bottom;
 
 	Rect _boardBounds;
-	bool _paused = false;
+	bool _paused;
 	PowerUp _currentPowerUp = null;
 
 	public GameObject powerupPrefab; 
@@ -17,6 +17,7 @@ public class PowerUpsManager : MonoBehaviour {
 	public int variantDelay = 5;
 
 	public void Pause(){
+		
 		_paused = true;
 		if (_currentPowerUp != null){
 			Destroy(_currentPowerUp.gameObject);
@@ -26,12 +27,20 @@ public class PowerUpsManager : MonoBehaviour {
 	}
 
 	public void Resume(){
+
+		if (!_paused){
+			return;
+		}
+
 		_paused = false;
+
+
 		StartCoroutine(CreatePowerUpsCoro());
 	}
 
 	void Start () {
 		_boardBounds = new Rect(left.position.x, bottom.position.y, right.position.x - left.position.x, top.position.y - bottom.position.y);
+		_paused = true;
 	}
 
 	IEnumerator CreatePowerUpsCoro ()
@@ -48,10 +57,11 @@ public class PowerUpsManager : MonoBehaviour {
 	}
 
 	bool CollidesWithObstacles(Vector3 pos){
-
 		var obstacles =	GameObject.FindGameObjectsWithTag("Obstacle").ToList();
 
-		var collidedObstacle = obstacles.FirstOrDefault(obs => obs.GetComponent<Collider2D>().bounds.Contains(pos));
+		Vector2 pos2d = new Vector2(pos.x, pos.y);
+
+		var collidedObstacle = obstacles.FirstOrDefault(obs => obs.GetComponent<Collider2D>().OverlapPoint(pos2d));
 
 		return collidedObstacle != null;
 	}

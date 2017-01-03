@@ -24,7 +24,7 @@ public class NinjaController : MonoBehaviour {
 
 	public int powerupDuration;
 
-	public Vector3 orgScale;
+	public Vector3 orgScale = Vector3.zero;
 
 	public PowerUp.PowerupType activePowerup = PowerUp.PowerupType.None;
 
@@ -72,7 +72,8 @@ public class NinjaController : MonoBehaviour {
 					if (star.tagToHit == gameObject.tag){
 						CollideWithEnemyStar (star);
 					}else{
-						//PickUpStar (star);
+						if ((star.GetYVelocity() < 0 && star.IsPlayerStar) || (star.GetYVelocity() > 0 && !star.IsPlayerStar))
+							PickUpStar (star);
 					}
 					break;
 				case NinjaStar.State.Grounded:
@@ -159,7 +160,11 @@ public class NinjaController : MonoBehaviour {
 	}
 
 	public virtual void Resume(){
-		orgScale = icon.transform.localScale;
+		if (orgScale == Vector3.zero)
+			orgScale = icon.transform.localScale;
+
+		icon.transform.localScale = orgScale;
+
 		isPaused = false;
 		isHit = false;
 		isThrowing = false;

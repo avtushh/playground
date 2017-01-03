@@ -29,6 +29,8 @@ public class NinjaGameManager : MonoBehaviour {
 	public StarManager starManager;
 	public ObstaclesManager obstaclesManager;
 
+	public List<GameObject> frame;
+
 	public static bool isPaused = false;
 
 	void Start(){
@@ -83,7 +85,6 @@ public class NinjaGameManager : MonoBehaviour {
 		player.Init();
 		enemy.Init();
 
-		powerupManager.Pause();
 		currentRound = 0;
 		starManager.Clear();
 
@@ -194,5 +195,21 @@ public class NinjaGameManager : MonoBehaviour {
 		OnHit (enemy);
 	}
 
+	public void ShowErrorFrame(){
+		
+		frame.ForEach(x => {
+			x.SetActive(true);
+
+		});
+
+		LeanTween.delayedCall(gameObject, 0.1f, () => {
+			frame.ForEach(x => {
+				x.SetActive(false);
+
+			});
+
+		} );
+
+	}
 
 }

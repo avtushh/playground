@@ -46,6 +46,7 @@ public class PlayerNinjaController : NinjaController
 			return;
 
 		if (!canThrow ()) {
+			FindObjectOfType<NinjaGameManager>().ShowErrorFrame();
 			return;
 		}
 
