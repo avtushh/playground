@@ -26,17 +26,6 @@ public class ObstacleUnit : MonoBehaviour {
 		return obstacles.Count(x => x.GetComponent<Collider2D>().enabled);
 	}
 
-	public static void ActivateAll(){
-		var obstacles = GameObject.FindGameObjectsWithTag("Obstacle").ToList();
-
-		obstacles.ForEach(x => 
-			{
-				x.GetComponent<ObstacleUnit>().SetAlpha(1);
-			}
-	
-		);
-	}
-
 	public bool IsEnabled(){
 		if (_collider == null)
 			return true;
@@ -48,11 +37,6 @@ public class ObstacleUnit : MonoBehaviour {
 		_spriteRenderer = GetComponent<SpriteRenderer> ();
 		_orgColor = _spriteRenderer.color;
 		_collider = GetComponent<Collider2D>();
-	}
-
-	void Start(){
-		
-		LeanTween.delayedCall(gameObject, Random.Range(0.1f, 0.5f), MoveUpDown);
 	}
 
 	void OnDestroy(){
@@ -76,13 +60,18 @@ public class ObstacleUnit : MonoBehaviour {
 
 	void Hide ()
 	{
-		LeanTween.value (gameObject, SetAlpha, 1, 0, 0.2f).setOnComplete(Reincarnate);
+		var alphatween = LeanTween.value (gameObject, SetAlpha, 1, 0, 0.2f);
+
+		if (GameSettings.reincartantBBTanObstacles){
+			alphatween.setOnComplete(Reincarnate);
+		}
+
 		uiHitPoints.text = "";
 		_collider.enabled = false;
 	}
 
 	void Reincarnate(){
-		LeanTween.value (gameObject, SetAlpha, 0, 1, 10f).setOnComplete(UpdatePoints).setEase(LeanTweenType.easeInExpo);
+		LeanTween.value (gameObject, SetAlpha, 0, 1, GameSettings.timeToReincarnateBBTan).setOnComplete(UpdatePoints).setEase(LeanTweenType.easeInExpo);
 	}
 
 
@@ -106,6 +95,11 @@ public class ObstacleUnit : MonoBehaviour {
 	}
 
 	void SetAlpha(float val){
+
+		if (_spriteRenderer == null){
+			_spriteRenderer = GetComponent<SpriteRenderer> ();
+		}
+
 		var c = _spriteRenderer.color;
 		c.a = val;
 		_spriteRenderer.color = c;
@@ -113,15 +107,17 @@ public class ObstacleUnit : MonoBehaviour {
 
 	void UpdatePoints ()
 	{
-		initHitPoints = Random.Range (1, 5);
+		initHitPoints = Random.Range (1, 10);
 		_hitpoints = initHitPoints;
 		UpdateHitpointsText ();
 		_collider.enabled = true;
+		SetAlpha(1);
 	}
 
 	void OnEnable(){
+		LeanTween.cancel(gameObject);
 		UpdatePoints ();
-
+		LeanTween.delayedCall(gameObject, Random.Range(0.1f, 0.5f), MoveUpDown);
 	}
 
 	void UpdateHitpointsText ()

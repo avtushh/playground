@@ -87,7 +87,7 @@ public class NinjaGameManager : MonoBehaviour {
 		currentRound = 0;
 		starManager.Clear();
 
-		LeanTween.delayedCall(gameObject, 0.5f, () => StartCoroutine(ShowObstaclesOnInitRoundCoro()));
+		LeanTween.delayedCall(gameObject, 0.5f, ShowNextRound);
 	}
 
 	IEnumerator ShowObstaclesOnInitRoundCoro(){
@@ -113,6 +113,7 @@ public class NinjaGameManager : MonoBehaviour {
 	void StartNextRound(){
 		currentRound++;
 		starManager.InitRound();
+		obstaclesManager.ActivateObstaclesGroupByType();
 
 		Resume();
 	}

@@ -10,12 +10,21 @@ public class ObstaclesManager : MonoBehaviour {
 		None,BBTan, Wheels
 	}
 
-	public List<ObstaclesGroup> obstaclesList;
+	public GameObject bbtnPrefab;
+	public GameObject wheelsPrefab;
+
 
 	public static ObstacleType initObstacleType = ObstacleType.BBTan;
 
 	public ObstaclesGroup currentObstalcesGroup;
 	public ObstacleType currentType = ObstacleType.None;
+
+	public Dictionary<ObstacleType, GameObject> typeToPrefabDict = new Dictionary<ObstacleType, GameObject>();
+
+	void Awake(){
+		typeToPrefabDict.Add(ObstacleType.BBTan, bbtnPrefab);
+		typeToPrefabDict.Add(ObstacleType.Wheels, wheelsPrefab);
+	}
 
 	ObstacleType GetNextType(){
 		if (currentType == ObstacleType.None)
@@ -34,22 +43,17 @@ public class ObstaclesManager : MonoBehaviour {
 		}
 
 		if (currentObstalcesGroup != null){
-
-			if (currentObstalcesGroup.obstacleType == obsType){
-				currentObstalcesGroup.gameObject.SetActive(true);
-			}else{
-				currentObstalcesGroup.gameObject.SetActive(false);
-			}
+			Destroy(currentObstalcesGroup.gameObject);
 		}
 
-		currentObstalcesGroup = obstaclesList.FirstOrDefault(x => x.obstacleType == obsType);
-		if (currentObstalcesGroup != null){
-			currentObstalcesGroup.gameObject.SetActive(true);
-			currentType = obsType;
+		var go = GameObject.Instantiate(typeToPrefabDict[obsType]);
 
-			if (currentType == ObstacleType.BBTan){
-				//ObstacleUnit.ActivateAll();
-			}
+		go.transform.SetParent(transform, false);
+
+		currentObstalcesGroup = go.GetComponent<ObstaclesGroup>();
+
+		if (currentObstalcesGroup != null){
+			currentType = obsType;
 		}
 
 

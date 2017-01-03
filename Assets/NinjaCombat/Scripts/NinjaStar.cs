@@ -98,8 +98,9 @@ public class NinjaStar : MonoBehaviour {
 				break;
 			case "Obstacle":
 				//Debug.LogError("hit obstacle");
-
-				other.gameObject.GetComponent<ObstacleUnit>().Hit();
+				var obs = other.gameObject.GetComponent<ObstacleUnit>();
+				if (obs != null)
+					obs.Hit();
 				//Hit();
 				break;
 			
