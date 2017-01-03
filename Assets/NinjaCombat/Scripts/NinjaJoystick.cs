@@ -108,11 +108,10 @@ public class NinjaJoystick : MonoBehaviour {
 		}else{
 			TimeSpan span = DateTime.Now - _swipeStartTime;
 
-			if (span.TotalSeconds >= maxAimingTime){
+			if (span.TotalSeconds >= maxAimingTime || swipeDir.y < minSwipeAngle){
 				
 				_startSwipePos = currScreenPos;
 				SwipeDoneEvent(swipeDir);
-				//SwipeCanceledEvent();
 				_isSwiping = false;
 			}else{
 				CheckSwipe(_startSwipePos, currScreenPos);
@@ -133,12 +132,15 @@ public class NinjaJoystick : MonoBehaviour {
 
 	bool CheckSwipe(Vector3 downPos, Vector3 currPos){
 		var deltaPos = currPos - downPos;
+
 		swipeDir = deltaPos.normalized;
 
 		//Unit Vector of change in position
 		swipeDistance = deltaPos.magnitude;
 
-		return swipeDistance >= swipeMinDistance && swipeDir.y > minSwipeAngle;
+		DebugText.SetText(swipeDir.ToString());
+
+		return swipeDistance >= swipeMinDistance && swipeDir.y > minSwipeAngle && currPos.y - swipeMinDistance > downPos.y;
 		//var swipeSpeed = deltaPos.magnitude / downTime;
 	}
 }

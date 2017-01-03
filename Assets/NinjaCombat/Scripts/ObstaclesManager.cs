@@ -7,14 +7,14 @@ using System.Linq;
 public class ObstaclesManager : MonoBehaviour {
 
 	public enum ObstacleType{
-		None,BBTan, Wheels
+		None, BBTan, Wheels, Paddles, BBTan2
 	}
 
-	public GameObject bbtnPrefab;
+	public GameObject bbtnPrefab, bbtn2Prefab;
 	public GameObject wheelsPrefab;
+	public GameObject paddlesPrefab;
 
-
-	public static ObstacleType initObstacleType = ObstacleType.BBTan;
+	public static ObstacleType initObstacleType = ObstacleType.Paddles;
 
 	public ObstaclesGroup currentObstalcesGroup;
 	public ObstacleType currentType = ObstacleType.None;
@@ -24,6 +24,8 @@ public class ObstaclesManager : MonoBehaviour {
 	void Awake(){
 		typeToPrefabDict.Add(ObstacleType.BBTan, bbtnPrefab);
 		typeToPrefabDict.Add(ObstacleType.Wheels, wheelsPrefab);
+		typeToPrefabDict.Add(ObstacleType.Paddles, paddlesPrefab);
+		typeToPrefabDict.Add(ObstacleType.BBTan2, bbtn2Prefab);
 	}
 
 	ObstacleType GetNextType(){
@@ -31,32 +33,32 @@ public class ObstaclesManager : MonoBehaviour {
 		{
 			return initObstacleType;
 		}else{
-			return currentType == ObstacleType.BBTan?ObstacleType.Wheels:ObstacleType.BBTan;
+			return currentType.Next(true);
 		}
 	}
 
+	public void ActivateObstaclesGroupByType(){
 
-	public void ActivateObstaclesGroupByType(ObstacleType obsType = ObstacleType.None){
+		var obsTypeNext = GetNextType();
 
-		if (obsType == ObstacleType.None){
-			obsType = GetNextType();
+		var obsTypeRandom = EnumUtils.RandomEnumValue<ObstacleType>(true);
+
+		if (currentType == obsTypeRandom){
+			currentType = obsTypeNext;
+		}else{
+			currentType = obsTypeRandom;
 		}
+
 
 		if (currentObstalcesGroup != null){
 			Destroy(currentObstalcesGroup.gameObject);
 		}
 
-		var go = GameObject.Instantiate(typeToPrefabDict[obsType]);
+		var go = GameObject.Instantiate(typeToPrefabDict[currentType]);
 
 		go.transform.SetParent(transform, false);
 
 		currentObstalcesGroup = go.GetComponent<ObstaclesGroup>();
-
-		if (currentObstalcesGroup != null){
-			currentType = obsType;
-		}
-
-
 	}
 		
 	void Hide(){

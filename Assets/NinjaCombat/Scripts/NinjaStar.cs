@@ -32,6 +32,8 @@ public class NinjaStar : MonoBehaviour {
 
 	bool _isFireball;
 
+	float _orgMagnitude;
+
 	Vector3 _orgScale;
 
 	public bool IsFireball {
@@ -71,12 +73,16 @@ public class NinjaStar : MonoBehaviour {
 			return;
 		}
 
-		if (IsActive && _rigidBody.velocity.magnitude < 4.5f && transform.parent == null){
-			if (_rigidBody.velocity.magnitude < 0.5f)
-				ThrowRandomDirection(15);
-			else
-				_rigidBody.velocity *= 5f;
+		if (IsActive && _rigidBody.velocity.magnitude < _orgMagnitude){
+			_rigidBody.velocity *= 1.01f;
 		}
+
+//		if (IsActive && _rigidBody.velocity.magnitude < 4.5f && transform.parent == null){
+//			if (_rigidBody.velocity.magnitude < 0.5f)
+//				ThrowRandomDirection(15);
+//			else
+//				_rigidBody.velocity *= 5f;
+//		}
 	}
 
 	public void SetTarget(string targetTag){
@@ -190,6 +196,9 @@ public class NinjaStar : MonoBehaviour {
 		normalCollider.enabled = true;
 		normalCollider.isTrigger = false;
 		transform.localScale = _orgScale;
+
+		_orgMagnitude = _rigidBody.velocity.magnitude;
+
 		state = State.Active;
 	}
 

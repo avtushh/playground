@@ -33,6 +33,12 @@ public class NinjaGameManager : MonoBehaviour {
 
 	public static bool isPaused = false;
 
+	public enum State{
+		StartRound, Active, HitEnemy, HitPlayer, Win, GameOver
+	}
+
+	public State state;
+
 	void Start(){
 
 		scoreStr = scoreText.text;
@@ -99,6 +105,7 @@ public class NinjaGameManager : MonoBehaviour {
 	}
 
 	void ShowNextRound(){
+		state = State.StartRound;
 		messagePanel.SetActive(false);
 		roundAnimations[currentRound].gameObject.SetActive(true);
 	}
@@ -171,18 +178,23 @@ public class NinjaGameManager : MonoBehaviour {
 		player.Resume();
 		powerupManager.Resume();
 		starManager.Resume();
+
+		state = State.Active;
 	}
 
 	void GameOver(){
+		state = State.GameOver;
 		ShowGameOverText();
 	}
 
 	void Win(){
+		state = State.Win;
 		ShowWinText();
 	}
 
 	void Player_HitEvent (NinjaStar obj)
 	{
+		state = State.HitPlayer;
 		enemyScore++;
 
 		OnHit (player);
@@ -190,6 +202,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 	void Enemy_HitEvent (NinjaStar obj)
 	{
+		state = State.HitEnemy;
 		playerScore++;
 
 		OnHit (enemy);
@@ -202,7 +215,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 		});
 
-		LeanTween.delayedCall(gameObject, 0.1f, () => {
+		LeanTween.delayedCall(gameObject, 0.2f, () => {
 			frame.ForEach(x => {
 				x.SetActive(false);
 

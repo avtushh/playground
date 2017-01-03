@@ -19,11 +19,11 @@ public class PowerUpsManager : MonoBehaviour {
 	public void Pause(){
 		
 		_paused = true;
-		if (_currentPowerUp != null){
-			Destroy(_currentPowerUp.gameObject);
-			_currentPowerUp = null;
-			StopAllCoroutines();
-		}
+		FindObjectsOfType<PowerUp>().ToList().ForEach(x => Destroy(x.gameObject));
+
+		_currentPowerUp = null;
+
+		StopAllCoroutines();
 	}
 
 	public void Resume(){
@@ -58,10 +58,12 @@ public class PowerUpsManager : MonoBehaviour {
 
 	bool CollidesWithObstacles(Vector3 pos){
 		var obstacles =	GameObject.FindGameObjectsWithTag("Obstacle").ToList();
-
+		 
 		Vector2 pos2d = new Vector2(pos.x, pos.y);
 
-		var collidedObstacle = obstacles.FirstOrDefault(obs => obs.GetComponent<Collider2D>().OverlapPoint(pos2d));
+
+
+		var collidedObstacle = obstacles.FirstOrDefault(obs => obs.GetComponent<Collider2D>().bounds.SqrDistance(pos2d) < 0.5f);
 
 		return collidedObstacle != null;
 	}
