@@ -109,7 +109,7 @@ public class StarManager : MonoBehaviour {
 		var starGo = Instantiate (starPrefab, pos, Quaternion.identity) as GameObject;
 		var star = starGo.GetComponent<NinjaStar> ();
 		star.IsFireball = false;
-		star.isGrounded = true;
+		star.state = NinjaStar.State.Grounded;
 
 		return star;
 	}

@@ -22,7 +22,7 @@ public class DetectStarCollision : MonoBehaviour {
 		if (other.tag == "Bullet"){
 			var star = other.GetComponent<NinjaStar>();
 
-			if (star.IsPlayerStar && !star.isGrounded){
+			if (star.IsPlayerStar && star.IsActive){
 				StarComingEvent(star);
 			}
 		}

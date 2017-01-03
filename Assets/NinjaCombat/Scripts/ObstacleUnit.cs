@@ -82,9 +82,7 @@ public class ObstacleUnit : MonoBehaviour {
 		HighlightColor();
 
 		if (_hitpoints == 0){
-			Hide ();
-			//gameObject.SetActive(false);
-			Instantiate(particlesPrefab, transform.position, Quaternion.identity);
+			CriticleHit();
 		}
 	}
 

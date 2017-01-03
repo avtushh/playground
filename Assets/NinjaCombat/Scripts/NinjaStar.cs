@@ -19,7 +19,13 @@ public class NinjaStar : MonoBehaviour {
 	public SpriteRenderer spriteRenderer;
 	public Sprite sprBlack, sprRed;
 	public string tagToHit = NinjaTags.Player;
-	public bool isGrounded;
+
+	public enum State{
+		Grounded, Held, Active
+	}
+
+	public State state;
+
 	public Collider2D normalCollider;
 
 	public GameObject fireBall;
@@ -42,6 +48,18 @@ public class NinjaStar : MonoBehaviour {
 		}
 	}
 
+	public bool IsActive {
+		get{
+			return state == State.Active;
+		}
+	}
+
+	public bool IsGrounded {
+		get{
+			return state == State.Grounded;
+		}
+	}
+
 	void Awake () {
 		_rigidBody = GetComponent<Rigidbody2D>();
 		_orgScale = transform.localScale;
@@ -53,7 +71,7 @@ public class NinjaStar : MonoBehaviour {
 			return;
 		}
 
-		if (!isGrounded && _rigidBody.velocity.magnitude < 4.5f && transform.parent == null){
+		if (IsActive && _rigidBody.velocity.magnitude < 4.5f && transform.parent == null){
 			if (_rigidBody.velocity.magnitude < 0.5f)
 				ThrowRandomDirection(15);
 			else
@@ -86,7 +104,7 @@ public class NinjaStar : MonoBehaviour {
 			case "Bullet":
 				var otherStar = other.gameObject.GetComponent<NinjaStar>();
 
-				if (otherStar.tagToHit != tagToHit){
+				if (otherStar.tagToHit != tagToHit && !IsFireball){
 					//Debug.LogError("hit another bullet");
 					Hit();	
 				}
@@ -137,7 +155,6 @@ public class NinjaStar : MonoBehaviour {
 		var go = Instantiate (gameObject, transform.position, Quaternion.identity) as GameObject;
 		var star = go.GetComponent<NinjaStar> ();
 		star.IsFireball = IsFireball;
-		star.isGrounded = false;
 		star.SetTarget(star.tagToHit);
 		Vector2 velocity = Quaternion.Euler (0, angle, 0) * _rigidBody.velocity;
 		star.Throw (velocity);
@@ -148,7 +165,7 @@ public class NinjaStar : MonoBehaviour {
 		_rigidBody.velocity = Vector2.zero;
 		_rigidBody.angularVelocity = 0;
 
-		isGrounded = true;
+		state = State.Grounded;
 
 		normalCollider.isTrigger = true;
 
@@ -160,7 +177,7 @@ public class NinjaStar : MonoBehaviour {
 		_rigidBody.velocity = Vector2.zero;
 		_rigidBody.angularVelocity = 0;
 
-		isGrounded = false;
+		state = State.Held;
 		normalCollider.enabled = false;
 		LeanTween.cancel(gameObject);
 	}
@@ -173,6 +190,7 @@ public class NinjaStar : MonoBehaviour {
 		normalCollider.enabled = true;
 		normalCollider.isTrigger = false;
 		transform.localScale = _orgScale;
+		state = State.Active;
 	}
 
 	public void ThrowRandomDirection(float speed){

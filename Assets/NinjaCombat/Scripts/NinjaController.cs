@@ -67,25 +67,31 @@ public class NinjaController : MonoBehaviour {
 			if (star == null)
 				return;
 
-			if (!star.isGrounded){
-				if (star.tagToHit == gameObject.tag){
-					//Debug.LogError("Hit " + star.tagToHit);
-					star.Hit();
-					if (!shield.activeInHierarchy){
-						isHit = true;
-						HitEvent(star);	
+			switch(star.state){
+				case NinjaStar.State.Active:
+					if (star.tagToHit == gameObject.tag){
+						CollideWithEnemyStar (star);
 					}else{
-						ToggleShield(false);
+						//PickUpStar (star);
 					}
-
-				}else{
-					float velY = star.GetYVelocity();
-					if ((star.IsPlayerStar && velY < 0) || (!star.IsPlayerStar && velY > 0))
-						PickUpStar (star);
-				}
-			}else{
-				PickUpStar (star);
+					break;
+				case NinjaStar.State.Grounded:
+					PickUpStar (star);
+					break;
 			}
+		}
+	}
+
+	void CollideWithEnemyStar (NinjaStar star)
+	{
+		//Debug.LogError("Hit " + star.tagToHit);
+		star.Hit ();
+		if (!shield.activeInHierarchy) {
+			isHit = true;
+			HitEvent (star);
+		}
+		else {
+			ToggleShield (false);
 		}
 	}
 
