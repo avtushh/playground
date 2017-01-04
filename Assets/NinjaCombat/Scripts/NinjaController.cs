@@ -98,6 +98,9 @@ public class NinjaController : MonoBehaviour {
 
 	void PickUpStar (NinjaStar star)
 	{
+		if (tagToHit == NinjaTags.Enemy){
+			SoundManager.PlayPickupStarSound();
+		}
 		star.Pickup ();
 		star.transform.position = starHolder.position;
 		star.transform.SetParent (starHolder, true);
@@ -212,18 +215,21 @@ public class NinjaController : MonoBehaviour {
 		var throwYSpeed = normalizedSwipeDir.y * throwSpeed;
 		var star = DequeueStar();
 		star.Throw(new Vector2(throwXSpeed, throwYSpeed));
+		SoundManager.PlayThrowSound();
 		return star;
 	}
 
 	public NinjaStar ThrowRandomDirectionStar(float throwSpeed){
 		var star = DequeueStar();
 		star.ThrowRandomDirection(throwSpeed);
+		SoundManager.PlayThrowSound();
 		return star;
 	}
 
 	public NinjaStar ThrowAt(Vector3 pos){
 		var star = DequeueStar();
 		star.ThrowAt(throwSpeed, pos);
+		SoundManager.PlayThrowSound();
 		return star;
 	}
 

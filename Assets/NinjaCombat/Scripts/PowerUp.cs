@@ -49,6 +49,8 @@ public class PowerUp : MonoBehaviour
 		if (other.tag == "Bullet") {
 			var ninjaStar = other.gameObject.GetComponent<NinjaStar> ();
 
+			SoundManager.PlayPickupStarSound();
+
 			switch (type) {
 				case PowerupType.FireBall:
 					ninjaStar.IsFireball = true;

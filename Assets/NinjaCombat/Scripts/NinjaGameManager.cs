@@ -108,10 +108,23 @@ public class NinjaGameManager : MonoBehaviour {
 		state = State.StartRound;
 		messagePanel.SetActive(false);
 		roundAnimations[currentRound].gameObject.SetActive(true);
+		switch(currentRound){
+			case 0:
+				SoundManager.PlayRoundOne();
+				break;
+			case 1:
+				SoundManager.PlayRoundTwo();
+				break;
+			case 2:
+				SoundManager.PlayFinalRound();
+				break;
+
+		}
 	}
 
 	void OnStartRoundAnimationComplete ()
 	{
+		
 		LeanTween.delayedCall(gameObject, 1f, () => {
 			roundAnimations[currentRound].gameObject.SetActive(false);
 			StartNextRound();
@@ -130,6 +143,7 @@ public class NinjaGameManager : MonoBehaviour {
 
 	void OnHit (NinjaController hitNinja)
 	{
+		SoundManager.PlayHitSound();
 		Pause();
 		starManager.Clear();
 		hitNinja.ShowHitAnimation(hitAnimationTime);

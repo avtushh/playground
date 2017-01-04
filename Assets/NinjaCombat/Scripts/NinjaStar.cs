@@ -121,11 +121,15 @@ public class NinjaStar : MonoBehaviour {
 				Hit();
 				break;
 			case "Obstacle":
+				SoundManager.PlayHitWallSound();
 				//Debug.LogError("hit obstacle");
 				var obs = other.gameObject.GetComponent<ObstacleUnit>();
 				if (obs != null)
 					obs.Hit();
 				//Hit();
+				break;
+			case "Wall":
+				SoundManager.PlayHitWallSound();
 				break;
 			
 		}
