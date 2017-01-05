@@ -25,7 +25,8 @@ public class SoundManager : MonoBehaviour {
 	}
 
 	public static void PlayHitWallSound(){
-		Instance.PlaySound(Instance.sfxHitWall);
+		//Instance.audioSource.Play();
+		Instance.PlaySound(Instance.sfxHitWall, 0.5f);
 	}
 
 	public static void PlayPickupStarSound(){
@@ -33,15 +34,15 @@ public class SoundManager : MonoBehaviour {
 	}
 
 	public static void PlayRoundOne(){
-		Instance.PlaySound(Instance.sfxRoundOne);
+		Instance.PlaySound(Instance.sfxRoundOne, 0.7f);
 	}
 
 	public static void PlayRoundTwo(){
-		Instance.PlaySound(Instance.sfxRoundTwo);
+		Instance.PlaySound(Instance.sfxRoundTwo, 0.7f);
 	}
 
 	public static void PlayFinalRound(){
-		Instance.PlaySound(Instance.sfxFinalRound);
+		Instance.PlaySound(Instance.sfxFinalRound, 0.8f);
 	}
 
 	void PlaySound (AudioClip clip, float volume = 1.0f){
