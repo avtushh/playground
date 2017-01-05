@@ -27,7 +27,6 @@ public class PowerUp : MonoBehaviour
 
 		type = types[UnityEngine.Random.Range(0, types.Count)];
 
-		type = PowerupType.Split;
 		_sprRenderer = GetComponent<SpriteRenderer> ();
 
 

@@ -28,29 +28,40 @@ public class ObstaclesManager : MonoBehaviour {
 		typeToPrefabDict.Add(ObstacleType.Wheels, wheelsPrefab);
 		typeToPrefabDict.Add(ObstacleType.Paddles, paddlesPrefab);
 		typeToPrefabDict.Add(ObstacleType.BBTan2, bbtn2Prefab);
-		typeToPrefabDict.Add(ObstacleType.Bottle, bottlePrefab);
+		//typeToPrefabDict.Add(ObstacleType.Bottle, bottlePrefab);
 		typeToPrefabDict.Add(ObstacleType.Wind, windPrefab);
 	}
 
 	ObstacleType GetNextType(){
 		if (currentType == ObstacleType.None)
 		{
-			return initObstacleType;
+			var typesList = typeToPrefabDict.Keys.ToList();
+
+			return typesList[Random.Range(0, typesList.Count)];
 		}else{
-			return currentType.Next(true);
+
+			var typesList = typeToPrefabDict.Keys.ToList();
+
+			var currentIndex = typesList.IndexOf(currentType);
+
+			currentIndex = (currentIndex + 1) % typesList.Count;
+
+			return typesList[currentIndex];
+
+			//return currentType.Next(true);
 		}
 	}
 
 	public void ActivateObstaclesGroupByType(){
-		var obsTypeNext = GetNextType();
+		currentType = GetNextType();
 
-		var obsTypeRandom = EnumUtils.RandomEnumValue<ObstacleType>(true);
+		//var obsTypeRandom = EnumUtils.RandomEnumValue<ObstacleType>(true);
 
-		if (currentType == obsTypeRandom){
-			currentType = obsTypeNext;
-		}else{
-			currentType = obsTypeRandom;
-		}
+//		if (currentType == obsTypeRandom){
+//			currentType = obsTypeNext;
+//		}else{
+//			currentType = obsTypeRandom;
+//		}
 
 
 		if (currentObstalcesGroup != null){

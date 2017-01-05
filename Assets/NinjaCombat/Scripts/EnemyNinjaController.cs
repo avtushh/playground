@@ -29,10 +29,10 @@ public class EnemyNinjaController : NinjaController{
 	void Detector_StarComingEvent (NinjaStar star)
 	{
 		if (star.transform.position.x < transform.position.x){ // star is to my right
-			moveHoriz.MoveLeft();
+			moveHoriz.MoveLeft(true);
 
 		}else{ // star is to my right
-			moveHoriz.MoveRight();
+			moveHoriz.MoveRight(true);
 		}
 	}
 

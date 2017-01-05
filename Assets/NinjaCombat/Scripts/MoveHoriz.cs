@@ -109,6 +109,21 @@ public class MoveHoriz : MonoBehaviour
 		return LeanTween.tweenOnCurve (currentTween, futureRatio);
 	}
 
+	float GetAnimationTime (float targetX)
+	{
+		var distanceForTime = Mathf.Abs (_right - _left); // 6
+
+		var ratioOfDistance = (Mathf.Abs (targetX - transform.position.x)) / distanceForTime;
+
+		return animationTime * ratioOfDistance;
+	}
+
+	public bool IsMovingRight {
+		get {
+			return _direction == Direction.Right;
+		}
+	}
+
 
 	public void TurnRight ()
 	{
@@ -126,9 +141,8 @@ public class MoveHoriz : MonoBehaviour
 		}
 	}
 
-	public void MoveRight ()
+	public void MoveRight (bool dodge = false)
 	{
-
 		TurnRight ();
 
 		if (currentTween != null) {
@@ -137,25 +151,15 @@ public class MoveHoriz : MonoBehaviour
 
 		var time = GetAnimationTime (_right);
 
-		currentTween = LeanTween.moveX (gameObject, _right, time).setEase (moveCurve).setOnComplete (MoveLeft);
-	}
-
-	float GetAnimationTime (float targetX)
-	{
-		var distanceForTime = Mathf.Abs (_right - _left); // 6
-
-		var ratioOfDistance = (Mathf.Abs (targetX - transform.position.x)) / distanceForTime;
-
-		return animationTime * ratioOfDistance;
-	}
-
-	public bool IsMovingRight {
-		get {
-			return _direction == Direction.Right;
+		if (dodge){
+			time /= 3;
 		}
+
+		currentTween = LeanTween.moveX (gameObject, _right, time).setEase (moveCurve).setOnComplete (() => MoveLeft(false));
 	}
 
-	public void MoveLeft ()
+
+	public void MoveLeft (bool dodge = false)
 	{
 
 		TurnLeft ();
@@ -166,7 +170,11 @@ public class MoveHoriz : MonoBehaviour
 
 		var time = GetAnimationTime (_left);
 
-		currentTween = LeanTween.moveX (gameObject, _left, time).setEase (moveCurve).setOnComplete (MoveRight);
+		if (dodge){
+			time /= 2;
+		}
+
+		currentTween = LeanTween.moveX (gameObject, _left, time).setEase (moveCurve).setOnComplete (() => MoveRight(false));
 	}
 
 	public void SwitchDirection ()
