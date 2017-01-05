@@ -104,7 +104,7 @@ public class NinjaJoystick : MonoBehaviour {
 
 		if (!_isSwiping){
 			JoystickMoveEvent(currWorldPos);
-			_startSwipePos = currScreenPos;
+			_lastTouchPosition = currScreenPos;
 		}else{
 			TimeSpan span = DateTime.Now - _swipeStartTime;
 
@@ -113,6 +113,7 @@ public class NinjaJoystick : MonoBehaviour {
 				_startSwipePos = currScreenPos;
 				SwipeDoneEvent(swipeDir);
 				_isSwiping = false;
+
 			}else{
 				CheckSwipe(_startSwipePos, currScreenPos);
 				var downWorldPos = Camera.main.ScreenToWorldPoint(_startSwipePos);

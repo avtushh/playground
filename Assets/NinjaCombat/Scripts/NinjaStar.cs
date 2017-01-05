@@ -154,9 +154,9 @@ public class NinjaStar : MonoBehaviour {
 
 	public void Split ()
 	{
-		DuplicateStarAtAngle (90);
-		DuplicateStarAtAngle (65);
-		DuplicateStarAtAngle (-65);
+		DuplicateStarAtAngle (80);
+		DuplicateStarAtAngle (10);
+		DuplicateStarAtAngle (170);
 		Hit();
 	}
 

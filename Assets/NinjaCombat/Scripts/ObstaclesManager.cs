@@ -7,12 +7,14 @@ using System.Linq;
 public class ObstaclesManager : MonoBehaviour {
 
 	public enum ObstacleType{
-		None, BBTan, Wheels, Paddles, BBTan2
+		None, BBTan, Wheels, Paddles, BBTan2, Bottle, Wind
 	}
 
 	public GameObject bbtnPrefab, bbtn2Prefab;
 	public GameObject wheelsPrefab;
 	public GameObject paddlesPrefab;
+	public GameObject bottlePrefab;
+	public GameObject windPrefab;
 
 	public static ObstacleType initObstacleType = ObstacleType.Paddles;
 
@@ -26,6 +28,8 @@ public class ObstaclesManager : MonoBehaviour {
 		typeToPrefabDict.Add(ObstacleType.Wheels, wheelsPrefab);
 		typeToPrefabDict.Add(ObstacleType.Paddles, paddlesPrefab);
 		typeToPrefabDict.Add(ObstacleType.BBTan2, bbtn2Prefab);
+		typeToPrefabDict.Add(ObstacleType.Bottle, bottlePrefab);
+		typeToPrefabDict.Add(ObstacleType.Wind, windPrefab);
 	}
 
 	ObstacleType GetNextType(){
@@ -38,7 +42,6 @@ public class ObstaclesManager : MonoBehaviour {
 	}
 
 	public void ActivateObstaclesGroupByType(){
-
 		var obsTypeNext = GetNextType();
 
 		var obsTypeRandom = EnumUtils.RandomEnumValue<ObstacleType>(true);
