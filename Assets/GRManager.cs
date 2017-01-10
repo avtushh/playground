@@ -3,6 +3,7 @@ using System.Collections;
 using GestureRecognizer;
 using System.Linq;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class GRManager : MonoBehaviour {
 
@@ -11,10 +12,22 @@ public class GRManager : MonoBehaviour {
 	public GestureBehaviour gestureBehaviour;
 	public GameObject gameOverCanvas;
 
+	public List<Grinder> visibleGrinders;
+
 	bool _recognizeShape = false;
 
 	void Start(){
 		AddListeners ();
+
+		StartCoroutine(CheckObstaclesForGesturesCoro());
+	}
+
+	IEnumerator CheckObstaclesForGesturesCoro(){
+		while(true){
+			yield return new WaitForSeconds(0.1f);
+
+			visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsInCameraBounds()).ToList();
+		}
 	}
 
 	void OnDestroy(){
@@ -61,20 +74,29 @@ public class GRManager : MonoBehaviour {
 	{
 		print("gesture result: " + result.Name + ", score: " + result.Score);
 
-		var grinders = FindObjectsOfType<Grinder>().ToList().Where(x => x.type == result.Name && x.IsInCameraBounds()).ToList();
+		visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsInCameraBounds()).ToList();
+
+		var grinders = visibleGrinders.Where(x => x.type == result.Name).ToList();
 
 		if (grinders.Count > 0){
-			Debug.LogError("FOund!");
-			gestureBehaviour.gameObject.SetActive(false);
-			grinders.ForEach(g => Destroy(g.gameObject));
-			LeanTween.delayedCall(0.2f, () => player.GetComponent<SlowDownJump>().ResetPhysics());
+			Debug.LogError("Found shape: " + result.Name);
+
+			grinders.ForEach(g => {
+
+				visibleGrinders.Remove(g);
+				Destroy(g.gameObject);
+			});
+
+
 		}else{
 			print ("try again");
 		}
 
 		gestureBehaviour.ClearGesture();
 
-
-
+		if (visibleGrinders.Count == 0){
+			Debug.LogError("reset physics");
+			LeanTween.delayedCall(0.2f, () => player.GetComponent<SlowDownJump>().ResetPhysics());
+		}
 	}
 }

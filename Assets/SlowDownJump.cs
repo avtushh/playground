@@ -18,7 +18,7 @@ public class SlowDownJump : MonoBehaviour {
 	bool _isSlowMotion;
 
 	float _startSlowHeight = 2;
-	float _finishSlowHeight = 4;
+	float _finishSlowHeight = 2;
 
 	float _orgVelX; 
 
@@ -57,7 +57,7 @@ public class SlowDownJump : MonoBehaviour {
 						print("hit: " + hit.collider.gameObject.tag);
 						if (hit.collider.gameObject.tag == "Platform"){
 							if (Mathf.Abs(transform.position.y - _jumpPos.y) < _finishSlowHeight){
-								TriggerSlowdown(false);			
+								//TriggerSlowdown(false);			
 							}
 						}
 					}
@@ -91,14 +91,13 @@ public class SlowDownJump : MonoBehaviour {
 	void Land (Collision2D coll)
 	{
 		ResetPhysics ();
-
-
 		_isJumping = false;
 		LandEvent (coll.gameObject);
 	}
 
 	public void ResetPhysics ()
 	{
+		_isSlowMotion = false;
 		_rigidBody.gravityScale = _orgGravityScale;
 		Time.timeScale = 1;
 		var vel = _rigidBody.velocity;
