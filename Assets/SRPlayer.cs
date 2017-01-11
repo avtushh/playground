@@ -62,13 +62,9 @@ public class SRPlayer : MonoBehaviour {
 				rotation.z = 360-maxRotationAngle;
 			}
 
-			print(rotation.z);
-
-			//rotation.z = Mathf.Clamp(rotation.z, minRotationAngle, maxRotationAngle);
-
 			quaternion.eulerAngles = rotation;
 
-			//transform.rotation = quaternion;
+			transform.rotation = quaternion;
 
 
 		}
