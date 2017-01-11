@@ -26,7 +26,7 @@ public class GRManager : MonoBehaviour {
 		while(true){
 			yield return new WaitForSeconds(0.1f);
 
-			visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsInCameraBounds()).ToList();
+			visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsVisible).ToList();
 		}
 	}
 
@@ -40,6 +40,19 @@ public class GRManager : MonoBehaviour {
 		player.OnJump += Player_OnJump;
 		player.OnLand += Player_OnLand;
 		player.OnDie += Player_OnDie;
+
+		CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
+	}
+
+	void CameraViewListener_onVisibilityChange (bool isVisible, string tag)
+	{
+		if (tag == "Enemy"){
+			var slowJump = player.GetComponent<SlowDownJump>();
+
+			if (isVisible){
+				slowJump.SetSlowDownFlag();	
+			}
+		}
 	}
 
 	void RemoveListeners ()
@@ -74,7 +87,7 @@ public class GRManager : MonoBehaviour {
 	{
 		print("gesture result: " + result.Name + ", score: " + result.Score);
 
-		visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsInCameraBounds()).ToList();
+		visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsVisible).ToList();
 
 		var grinders = visibleGrinders.Where(x => x.type == result.Name).ToList();
 
@@ -96,7 +109,7 @@ public class GRManager : MonoBehaviour {
 
 		if (visibleGrinders.Count == 0){
 			Debug.LogError("reset physics");
-			LeanTween.delayedCall(0.2f, () => player.GetComponent<SlowDownJump>().ResetPhysics());
+			player.GetComponent<SlowDownJump>().ResetPhysics();
 		}
 	}
 }

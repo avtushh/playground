@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 public class SlowDownJump : MonoBehaviour {
 
 	public event Action JumpEvent = () => {};
 	public event Action<GameObject> LandEvent = (s) => {};
+
+	public AnimationCurve animationYCurve;
 
 	public LayerMask collisionMask;
 
@@ -13,12 +17,8 @@ public class SlowDownJump : MonoBehaviour {
 
 	Rigidbody2D _rigidBody;
 
-	Vector3 _jumpPos;
 	bool _shouldSlowWhileJumping;
 	bool _isSlowMotion;
-
-	float _startSlowHeight = 2;
-	float _finishSlowHeight = 2;
 
 	float _orgVelX; 
 
@@ -32,37 +32,39 @@ public class SlowDownJump : MonoBehaviour {
 		if (other.tag == "Jumper"){
 			if (!_isJumping){
 				_orgVelX = _rigidBody.velocity.x;
-				_shouldSlowWhileJumping = true;
+				//_shouldSlowWhileJumping = true;
 			}
 			Jump();
-
 		}
 	}
 
+	public void SetSlowDownFlag(){
+		_shouldSlowWhileJumping = true;
+	}
+
 	void Update(){
-		
 		if (_isJumping){
 
 			if (!_isSlowMotion && _shouldSlowWhileJumping){
-				
-				if (_rigidBody.velocity.y > 0 && Mathf.Abs(transform.position.y - _jumpPos.y) > _startSlowHeight){
-					TriggerSlowdown(true);
-				}
-			}else{
-				if (_rigidBody.velocity.y < 0){
-					Debug.DrawRay(transform.position, Vector2.down *10, Color.red);
-					var hit = Physics2D.Raycast(transform.position, Vector2.down, 10, collisionMask);
-
-					if (hit != null && hit.collider != null){
-						print("hit: " + hit.collider.gameObject.tag);
-						if (hit.collider.gameObject.tag == "Platform"){
-							if (Mathf.Abs(transform.position.y - _jumpPos.y) < _finishSlowHeight){
-								//TriggerSlowdown(false);			
-							}
-						}
-					}
-				}
+				TriggerSlowdown(true);
+				return;
 			}
+//				
+//
+//			var hit = Physics2D.Raycast(transform.position, Vector2.down, 10, collisionMask);
+//			Debug.DrawRay(transform.position, Vector2.down *10, Color.red);
+//
+//			if (hit != null && hit.collider != null){
+//				print("hit: " + hit.collider.gameObject.tag);
+//
+//				if (!_isSlowMotion && _shouldSlowWhileJumping){
+//					if (hit.collider.gameObject.tag == "Enemy"){
+//						TriggerSlowdown(true);
+//					}
+//				}else{
+//					
+//				}
+//			}
 		}
 	}
 
@@ -70,46 +72,37 @@ public class SlowDownJump : MonoBehaviour {
 
 	public void Jump ()
 	{
-		Time.timeScale = 1;
-
 		_rigidBody.gravityScale = 2;
-		var vel = _rigidBody.velocity;
-		vel.y = 15f;
-		if (_shouldSlowWhileJumping)
-			vel.x = _orgVelX / 2f ;
-		else
-			vel.x = _orgVelX;
-		
-		_rigidBody.velocity = vel;
+		_rigidBody.velocity = new Vector2(_orgVelX / 2f, 15);
 		_isJumping = true;
-		_jumpPos = transform.position;
 		JumpEvent ();
 	}
-
-
 
 	void Land (Collision2D coll)
 	{
 		ResetPhysics ();
+
 		_isJumping = false;
 		LandEvent (coll.gameObject);
 	}
 
 	public void ResetPhysics ()
 	{
-		_isSlowMotion = false;
+		TriggerSlowdown(false);
+
 		_rigidBody.gravityScale = _orgGravityScale;
-		Time.timeScale = 1;
 		var vel = _rigidBody.velocity;
 		vel.x = _orgVelX;
 		_rigidBody.velocity = vel;
+
 	}
 
-	void TriggerSlowdown(bool val){
+	public void TriggerSlowdown(bool val){
 		_isSlowMotion = val;
 		_shouldSlowWhileJumping = false;
 
-		Time.timeScale = val?0.3f:1f;
+		Time.timeScale = val?0.1f:1f;
+		Time.fixedDeltaTime = 0.02F * Time.timeScale;
 	}
 
 
@@ -117,7 +110,6 @@ public class SlowDownJump : MonoBehaviour {
 	{
 		if (_isJumping){
 			Land (coll);
-
 		}
 	}
 }

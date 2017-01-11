@@ -1,47 +1,50 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 public class Grinder : MonoBehaviour {
 
 	public string type;
 
-	public Collider2D col2d;
+	CameraViewListener viewListener;
 
-	VisibleListener _visibleListener;
+	public Transform shapeContainer;
 
-	Bounds _bounds;
+	public GameObject trianglePrefab, circlePrefab, letterEPrefab;
+
+	public Dictionary<string, GameObject> shapeToPrefab = new Dictionary<string, GameObject>();
+
+	void Awake(){
+
+		shapeToPrefab.Add("triangle", trianglePrefab);
+		shapeToPrefab.Add("circle", circlePrefab);
+		//shapeToPrefab.Add("letterE", letterEPrefab);
+
+
+
+		type = shapeToPrefab.Keys.ElementAt(UnityEngine.Random.Range(0, shapeToPrefab.Keys.Count));
+
+		var prefabToLoad = shapeToPrefab[type];
+
+		var go = Instantiate(prefabToLoad, Vector3.zero, Quaternion.identity) as GameObject;
+
+		go.transform.SetParent(shapeContainer, true);
+
+
+	}
 
 	void Start(){
-		_bounds = col2d.bounds;
+		viewListener = GetComponentInChildren<CameraViewListener>();
 
-		_visibleListener = GetComponentInChildren<VisibleListener>();
-
-		if (_visibleListener != null){
-			_visibleListener.OnVisibilityChange += OnVisibilityChange;
-		}
 	}
 
-	void OnVisibilityChange (bool visible)
-	{
-		Debug.LogError("Visibility Change: " + visible + " for transform at: " + _visibleListener.transform.position.x);
+	public bool IsVisible{
+		get{
+			return viewListener.isVisible;
+		} 
 	}
-
-	public bool IsInCameraBounds(bool addSafetlyDelta = false){
-
-		return IsPointInCameraBounds(_bounds.min, addSafetlyDelta) || IsPointInCameraBounds(_bounds.max, addSafetlyDelta);
-	}
-
-	public static bool IsPointInCameraBounds(Vector3 worldPoint, bool addSafetlyDelta = false){
-		var viewPortPosition = Camera.main.WorldToViewportPoint(worldPoint);
-
-		float minViewPort = addSafetlyDelta?-0.3f:0;
-		float maxViewPort = addSafetlyDelta?1.3f:1;
-
-		if (Mathf.Clamp(viewPortPosition.x, minViewPort, maxViewPort) != viewPortPosition.x || Mathf.Clamp(viewPortPosition.y, minViewPort, maxViewPort)!= viewPortPosition.y){
-			return false;
-		}
-
-		return true;
-	}
-
 }
+
+
