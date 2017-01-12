@@ -10,6 +10,7 @@ namespace GestureRecognizer
 		[SerializeField]
 		public List<Gesture> Gestures = new List<Gesture>();
 
+		public float gestureThreshold = 4f;
 
 		public Result Recognize(Gesture gesture) {
 
@@ -28,8 +29,46 @@ namespace GestureRecognizer
 			}
 
 			// Normalize score
-			result.Score = Mathf.Max((2f - result.Score) / 2f, 0f);
+			result.Score = Mathf.Max((gestureThreshold - result.Score) / gestureThreshold, 0f);
 			return result;
+		}
+
+		public List<Result> RecognizeAll(Gesture gesture, List<string> shapesToFind) {
+
+			float distance = float.MaxValue;
+
+			List<Result> sortedResults = new List<Result>();
+
+			// Compare gesture against all others
+			for (int i = 0; i < Gestures.Count; i++)
+			{
+				distance = GreedyCloudMatch(gesture.NormalizedPoints, Gestures[i].NormalizedPoints);
+				Result result = new Result();
+
+				result.Set(Gestures[i].Name, distance);
+				result.OriginalScore = distance;
+
+				result.Score = Mathf.Max((4 - result.Score) / 4, 0f);
+
+				if (result.Score > 0){
+
+					if (shapesToFind != null && shapesToFind.Count > 0){
+						if (shapesToFind.Contains(result.Name)){
+							sortedResults.Add(result);	
+							return sortedResults;
+						}
+					}
+
+					sortedResults.Add(result);	
+				}			
+			}
+			sortedResults.Sort(CompareScores);
+
+			return sortedResults;
+		}
+
+		int CompareScores(Result a, Result b){
+			return a.OriginalScore.CompareTo(b.OriginalScore);
 		}
 
 

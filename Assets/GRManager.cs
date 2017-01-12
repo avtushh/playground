@@ -12,22 +12,11 @@ public class GRManager : MonoBehaviour {
 	public GestureBehaviour gestureBehaviour;
 	public GameObject gameOverCanvas;
 
-	public List<Grinder> visibleGrinders;
-
-	bool _recognizeShape = false;
 
 	void Start(){
 		AddListeners ();
 
 		StartCoroutine(CheckObstaclesForGesturesCoro());
-	}
-
-	IEnumerator CheckObstaclesForGesturesCoro(){
-		while(true){
-			yield return new WaitForSeconds(0.1f);
-
-			visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsVisible).ToList();
-		}
 	}
 
 	void OnDestroy(){
@@ -36,32 +25,93 @@ public class GRManager : MonoBehaviour {
 
 	void AddListeners ()
 	{
-		GestureBehaviour.OnGestureRecognition += GestureRecognizer_GestureBehaviour_OnGestureRecognition;
+		//GestureBehaviour.OnGestureRecognition += OnGestureResult;
+		GestureBehaviour.OnGesturesRecognition += OnGesturessResult;
 		player.OnJump += Player_OnJump;
 		player.OnLand += Player_OnLand;
 		player.OnDie += Player_OnDie;
-
-		CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
-	}
-
-	void CameraViewListener_onVisibilityChange (bool isVisible, string tag)
-	{
-		if (tag == "Enemy"){
-			var slowJump = player.GetComponent<SlowDownJump>();
-
-			if (isVisible){
-				slowJump.SetSlowDownFlag();	
-			}
-		}
 	}
 
 	void RemoveListeners ()
 	{
-		GestureBehaviour.OnGestureRecognition -= GestureRecognizer_GestureBehaviour_OnGestureRecognition;
+		GestureBehaviour.OnGesturesRecognition -= OnGesturessResult;
+
 		player.OnJump -= Player_OnJump;
 		player.OnLand -= Player_OnLand;
 		player.OnDie -= Player_OnDie;
 	}
+
+	IEnumerator CheckObstaclesForGesturesCoro(){
+		while(true){
+			yield return new WaitForSeconds(0.05f);
+
+			var grinders = GetVisibleGrinders(false);
+			var shapesToFind = grinders.Select(item => item.type).ToList();
+
+			GestureBehaviour.shapesToFind = shapesToFind;
+		}
+	}
+
+	public List<Grinder> GetVisibleGrinders(bool addSafety){
+		return FindObjectsOfType<Grinder>().Where(x=> x.IsVisible(addSafety)).ToList();
+	}
+
+	void OnGesturessResult (Gesture gesture, List<Result> results)
+	{
+		Result minScoreShape = new Result();
+
+		var grinders = GetVisibleGrinders(false);
+
+		grinders.ForEach(grinder => {
+			var res = results.FirstOrDefault(x => x.Name == grinder.type);
+
+			if (res != null){
+				if (minScoreShape.Score > res.Score){
+					minScoreShape = res;
+				}
+			}
+		});
+
+		gestureBehaviour.ClearGesture ();
+
+		bool didDestroy = DestroyEnemiesOfType (minScoreShape.Name);
+
+		if (didDestroy){
+			//CheckForNoEnemies ();
+		}
+	}
+
+	void CheckForNoEnemies ()
+	{
+		var grinders = GetVisibleGrinders(true).Where(x => x.isAlive).ToList();
+		if (grinders == null || grinders.Count == 0) {
+			
+			player.GetComponent<SlowDownJump> ().ResetPhysics ();
+		}
+	}
+
+	bool DestroyEnemiesOfType (string name)
+	{
+		print ("Check shape: " + name);
+		var grindersWithShape = GetVisibleGrinders(false).Where(x => x.type == name).ToList();
+		if (grindersWithShape.Count > 0) {
+			print ("Found shape: " + name);
+			grindersWithShape.ForEach (g =>  {
+				g.Kill();
+			});
+			return true;
+		}
+		else {
+			return false;
+			print ("try again");
+		}
+
+
+
+	}
+
+
+
 
 	void Player_OnDie ()
 	{
@@ -72,44 +122,11 @@ public class GRManager : MonoBehaviour {
 	void Player_OnLand ()
 	{
 		gestureBehaviour.gameObject.SetActive(false);
-		_recognizeShape = false;
 	}
 
 	void Player_OnJump ()
 	{
-		if (!_recognizeShape){
-			_recognizeShape = true;
-			gestureBehaviour.gameObject.SetActive(true);
-		}
-	}
+		gestureBehaviour.gameObject.SetActive(true);
 
-	void GestureRecognizer_GestureBehaviour_OnGestureRecognition (Gesture gesture, Result result)
-	{
-		print("gesture result: " + result.Name + ", score: " + result.Score);
-
-		visibleGrinders = FindObjectsOfType<Grinder>().Where(x=> x.IsVisible).ToList();
-
-		var grinders = visibleGrinders.Where(x => x.type == result.Name).ToList();
-
-		if (grinders.Count > 0){
-			Debug.LogError("Found shape: " + result.Name);
-
-			grinders.ForEach(g => {
-
-				visibleGrinders.Remove(g);
-				Destroy(g.gameObject);
-			});
-
-
-		}else{
-			print ("try again");
-		}
-
-		gestureBehaviour.ClearGesture();
-
-		if (visibleGrinders.Count == 0){
-			Debug.LogError("reset physics");
-			player.GetComponent<SlowDownJump>().ResetPhysics();
-		}
 	}
 }

@@ -13,10 +13,13 @@
 		/// </summary>
 		public float Score { get; set; }
 
+		public float OriginalScore {get; set;}
+
 
 		public Result() {
 			this.Name = "No match";
 			this.Score = float.MaxValue;
+			this.OriginalScore = float.MaxValue;
 		}
 
 

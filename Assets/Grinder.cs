@@ -8,6 +8,8 @@ public class Grinder : MonoBehaviour {
 
 	public string type;
 
+	public bool isAlive = false;
+
 	CameraViewListener viewListener;
 
 	public Transform shapeContainer;
@@ -22,17 +24,15 @@ public class Grinder : MonoBehaviour {
 		shapeToPrefab.Add("circle", circlePrefab);
 		//shapeToPrefab.Add("letterE", letterEPrefab);
 
-
-
 		type = shapeToPrefab.Keys.ElementAt(UnityEngine.Random.Range(0, shapeToPrefab.Keys.Count));
 
 		var prefabToLoad = shapeToPrefab[type];
 
 		var go = Instantiate(prefabToLoad, Vector3.zero, Quaternion.identity) as GameObject;
 
-		go.transform.SetParent(shapeContainer, true);
+		go.transform.SetParent(shapeContainer, false);
 
-
+		isAlive = true;
 	}
 
 	void Start(){
@@ -40,10 +40,14 @@ public class Grinder : MonoBehaviour {
 
 	}
 
-	public bool IsVisible{
-		get{
-			return viewListener.isVisible;
-		} 
+	public bool IsVisible(bool addSafetyDelta){
+		
+		return viewListener.IsInCameraBounds(addSafetyDelta);
+	}
+
+	public void Kill(){
+		isAlive = false;
+		Destroy(gameObject);
 	}
 }
 

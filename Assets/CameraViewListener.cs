@@ -39,8 +39,10 @@ public class CameraViewListener : MonoBehaviour{
 	public static bool IsPointInCameraBounds(Vector3 worldPoint, bool addSafetlyDelta = false){
 		var viewPortPosition = Camera.main.WorldToViewportPoint(worldPoint);
 
-		float minViewPort = addSafetlyDelta?-0.3f:0;
-		float maxViewPort = addSafetlyDelta?1.3f:1;
+		//print ("enemy at: " + viewPortPosition);
+
+		float minViewPort = addSafetlyDelta?-0.1f:0;
+		float maxViewPort = addSafetlyDelta?1.1f:1;
 
 		if (Mathf.Clamp(viewPortPosition.x, minViewPort, maxViewPort) != viewPortPosition.x || Mathf.Clamp(viewPortPosition.y, minViewPort, maxViewPort)!= viewPortPosition.y){
 			return false;

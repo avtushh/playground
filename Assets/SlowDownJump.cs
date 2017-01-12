@@ -9,86 +9,45 @@ public class SlowDownJump : MonoBehaviour {
 	public event Action JumpEvent = () => {};
 	public event Action<GameObject> LandEvent = (s) => {};
 
-	public AnimationCurve animationYCurve;
-
 	public LayerMask collisionMask;
 
-	bool _isJumping;
+	public float slowDownAmount = 0.2f;
 
 	Rigidbody2D _rigidBody;
 
-	bool _shouldSlowWhileJumping;
 	bool _isSlowMotion;
 
 	float _orgVelX; 
+	float _orgGravityScale;
 
 	void Awake(){
 		_rigidBody = GetComponent<Rigidbody2D>();
 		_orgGravityScale = _rigidBody.gravityScale;
 	}
 
-	void OnTriggerEnter2D(Collider2D other) {
-
-		if (other.tag == "Jumper"){
-			if (!_isJumping){
-				_orgVelX = _rigidBody.velocity.x;
-				//_shouldSlowWhileJumping = true;
-			}
-			Jump();
-		}
-	}
-
-	public void SetSlowDownFlag(){
-		_shouldSlowWhileJumping = true;
-	}
-
-	void Update(){
-		if (_isJumping){
-
-			if (!_isSlowMotion && _shouldSlowWhileJumping){
-				TriggerSlowdown(true);
-				return;
-			}
-//				
-//
-//			var hit = Physics2D.Raycast(transform.position, Vector2.down, 10, collisionMask);
-//			Debug.DrawRay(transform.position, Vector2.down *10, Color.red);
-//
-//			if (hit != null && hit.collider != null){
-//				print("hit: " + hit.collider.gameObject.tag);
-//
-//				if (!_isSlowMotion && _shouldSlowWhileJumping){
-//					if (hit.collider.gameObject.tag == "Enemy"){
-//						TriggerSlowdown(true);
-//					}
-//				}else{
-//					
-//				}
-//			}
-		}
-	}
-
-	float _orgGravityScale;
-
 	public void Jump ()
 	{
-		_rigidBody.gravityScale = 2;
-		_rigidBody.velocity = new Vector2(_orgVelX / 2f, 15);
-		_isJumping = true;
-		JumpEvent ();
+		_orgVelX = _rigidBody.velocity.x;
+		print("jump!");
+		_rigidBody.gravityScale = 3;
+		_rigidBody.velocity = new Vector2(_orgVelX / 5f, 15);
+
+		LeanTween.delayedCall(0.2f, () =>JumpEvent());
 	}
 
-	void Land (Collision2D coll)
+	public void Land (Collision2D coll)
 	{
 		ResetPhysics ();
 
-		_isJumping = false;
 		LandEvent (coll.gameObject);
 	}
 
 	public void ResetPhysics ()
 	{
+		print ("reset physics");
 		TriggerSlowdown(false);
+
+		_rigidBody.isKinematic = false;
 
 		_rigidBody.gravityScale = _orgGravityScale;
 		var vel = _rigidBody.velocity;
@@ -97,19 +56,21 @@ public class SlowDownJump : MonoBehaviour {
 
 	}
 
-	public void TriggerSlowdown(bool val){
-		_isSlowMotion = val;
-		_shouldSlowWhileJumping = false;
-
-		Time.timeScale = val?0.1f:1f;
-		Time.fixedDeltaTime = 0.02F * Time.timeScale;
+	public void Freeze(){
+		_rigidBody.gravityScale = 0;
+		_rigidBody.velocity = new Vector2(0,0);
 	}
 
+	public void TriggerSlowdown(bool val){
 
-	void OnCollisionEnter2D (Collision2D coll)
-	{
-		if (_isJumping){
-			Land (coll);
+		if (val == _isSlowMotion){
+			return;
 		}
+
+		print("trigger slow down: " + val);
+		_isSlowMotion = val;
+
+		Time.timeScale = val?slowDownAmount:1f;
+		Time.fixedDeltaTime = 0.02F * Time.timeScale;
 	}
 }

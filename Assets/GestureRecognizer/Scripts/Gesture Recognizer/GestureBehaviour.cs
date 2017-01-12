@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine.EventSystems;
+using System.Linq;
+using System.Collections;
 
 namespace GestureRecognizer
 {
@@ -148,12 +150,22 @@ namespace GestureRecognizer
         /// </summary>
         private Vector3 screenPoint;
 
-
-        /// <summary>
+		/// <summary>
         /// Occurs when a gesture is recognized.
         /// </summary>
-        public static event Action<Gesture, Result> OnGestureRecognition;
+		public static event Action<Gesture, Result> OnGestureRecognition = (g,r) => {};
 
+		/// <summary>
+		/// Occurs when a gesture is recognized, returns all gestures
+		/// </summary>
+		public static event Action<Gesture, List<Result>> OnGesturesRecognition = (g,r) => {};
+
+		/// <summary>
+		/// Occurs when a gesture is recognized, returns all gestures
+		/// </summary>
+		public static event Action OnGesturesRecognitionStart = () => {};
+
+		public static List<string> shapesToFind;
 
         private void Start()
         {
@@ -259,15 +271,26 @@ namespace GestureRecognizer
         {
             if (points.Count > 2)
             {
-                Gesture gesture = CreateGesture();
-                Result result = library.Recognize(gesture);
-                
-                isRecognized = true;
-                
-                if (OnGestureRecognition != null)
-                    OnGestureRecognition(gesture, result);
+				StartCoroutine(RecognizeCoro());
             }
         }
+
+
+
+		//this is a coroutine which manages when columns are spawned
+		IEnumerator RecognizeCoro(){
+			yield return null;
+			OnGesturesRecognitionStart();
+			Gesture gesture = CreateGesture();
+			//Result result = library.Recognize(gesture);
+
+			var list = library.RecognizeAll(gesture, shapesToFind);
+
+			isRecognized = true;
+
+			//OnGestureRecognition(gesture, result);
+			OnGesturesRecognition(gesture, list);
+		}
 
 
         /// <summary>
