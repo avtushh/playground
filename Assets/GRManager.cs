@@ -58,6 +58,11 @@ public class GRManager : MonoBehaviour {
 
 	void OnGesturessResult (Gesture gesture, List<Result> results)
 	{
+		gestureBehaviour.ClearGesture ();
+		if (results == null || results.Count == 0){
+			return;
+		}
+
 		Result minScoreShape = new Result();
 
 		var grinders = GetVisibleGrinders(false);
@@ -72,21 +77,21 @@ public class GRManager : MonoBehaviour {
 			}
 		});
 
-		gestureBehaviour.ClearGesture ();
+
 
 		bool didDestroy = DestroyEnemiesOfType (minScoreShape.Name);
 
 		if (didDestroy){
-			//CheckForNoEnemies ();
+			CheckNoEnemies ();
 		}
 	}
 
-	void CheckForNoEnemies ()
+	void CheckNoEnemies ()
 	{
-		var grinders = GetVisibleGrinders(true).Where(x => x.isAlive).ToList();
+		var grinders = GetVisibleGrinders(false).Where(x => x.isAlive).ToList();
 		if (grinders == null || grinders.Count == 0) {
-			
-			player.GetComponent<SlowDownJump> ().ResetPhysics ();
+			player.OnNoEnemies();
+
 		}
 	}
 
@@ -117,6 +122,8 @@ public class GRManager : MonoBehaviour {
 	{
 		Time.timeScale = 1f;
 		gameOverCanvas.SetActive(true);
+		gestureBehaviour.ClearGesture();
+		gestureBehaviour.gameObject.SetActive(false);
 	}
 
 	void Player_OnLand ()

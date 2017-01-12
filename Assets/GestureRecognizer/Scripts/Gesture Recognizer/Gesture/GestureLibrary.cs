@@ -14,14 +14,16 @@ namespace GestureRecognizer
 
 		public Result Recognize(Gesture gesture) {
 
+
 			Result result = new Result();
+
 			float distance = float.MaxValue;
 
 			// Compare gesture against all others
 			for (int i = 0; i < Gestures.Count; i++)
 			{
+				iterations = 0;
 				distance = GreedyCloudMatch(gesture.NormalizedPoints, Gestures[i].NormalizedPoints);
-
 				if (distance < result.Score) 
 				{
 					result.Set(Gestures[i].Name, distance);
@@ -29,7 +31,10 @@ namespace GestureRecognizer
 			}
 
 			// Normalize score
-			result.Score = Mathf.Max((gestureThreshold - result.Score) / gestureThreshold, 0f);
+			result.Score = Mathf.Max((2 - result.Score) / 2, 0f);
+
+
+
 			return result;
 		}
 
@@ -88,11 +93,13 @@ namespace GestureRecognizer
 
 
 		private float GreedyCloudMatch(Point[] points1, Point[] points2) {
+
 			float e = 0.5f;
 			int step = Mathf.FloorToInt(Mathf.Pow(points1.Length, 1.0f - e));
 			float minDistance = float.MaxValue;
 
 			for (int i = 0; i < points1.Length; i += step) {
+				
 				float distance1 = CloudDistance(points1, points2, i);
 				float distance2 = CloudDistance(points2, points1, i);
 				minDistance = Mathf.Min(minDistance, Mathf.Min(distance1, distance2));
@@ -100,6 +107,7 @@ namespace GestureRecognizer
 			return minDistance;
 		}
 
+		public static int iterations = 0;
 
 		private float CloudDistance(Point[] points1, Point[] points2, int startIndex) {
 			bool[] matched = new bool[points1.Length];
@@ -109,6 +117,8 @@ namespace GestureRecognizer
 			int i = startIndex;
 
 			do {
+				iterations++;
+
 				int index = -1;
 				float minDistance = float.MaxValue;
 

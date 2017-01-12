@@ -4,6 +4,8 @@ using System;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections;
+using System.Threading;
+
 
 namespace GestureRecognizer
 {
@@ -167,6 +169,8 @@ namespace GestureRecognizer
 
 		public static List<string> shapesToFind;
 
+		public Thread thread;
+
         private void Start()
         {
             canvas = GetComponentInChildren<Canvas>();
@@ -213,6 +217,7 @@ namespace GestureRecognizer
             currentStrokeRenderer.material = lineMaterial;
             currentStrokeRenderer.SetColors(startColor, endColor);
             currentStrokeRenderer.SetWidth(startThickness, endThickness);
+			currentStrokeRenderer.sortingLayerName = "Line";
 
             strokes.Add(newStroke);
 
@@ -272,24 +277,44 @@ namespace GestureRecognizer
             if (points.Count > 2)
             {
 				StartCoroutine(RecognizeCoro());
+				thread = new Thread(Run);
+				thread.Start();
+
             }
+
         }
 
+		List<Result> recognizedShapes;
 
+		Gesture currentGesture;
+
+		void Run(){
+			currentGesture = CreateGesture();
+			if (shapesToFind != null && shapesToFind.Count > 0){
+				recognizedShapes = library.RecognizeAll(currentGesture, shapesToFind);
+				isRecognized = true;
+
+
+			}else{
+				Result result = library.Recognize(gesture);
+				recognizedShapes.Add(result);
+				isRecognized = true;
+
+			}
+		}
 
 		//this is a coroutine which manages when columns are spawned
 		IEnumerator RecognizeCoro(){
-			yield return null;
-			OnGesturesRecognitionStart();
-			Gesture gesture = CreateGesture();
-			//Result result = library.Recognize(gesture);
+			
+			while (!isRecognized){
+				yield return null;	
+			}
 
-			var list = library.RecognizeAll(gesture, shapesToFind);
+			if (shapesToFind != null && shapesToFind.Count > 0)
+				OnGesturesRecognition(currentGesture, recognizedShapes);
+			else
+				OnGestureRecognition(currentGesture, recognizedShapes[0]);
 
-			isRecognized = true;
-
-			//OnGestureRecognition(gesture, result);
-			OnGesturesRecognition(gesture, list);
 		}
 
 

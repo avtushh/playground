@@ -23,6 +23,7 @@ public class SlowDownJump : MonoBehaviour {
 	void Awake(){
 		_rigidBody = GetComponent<Rigidbody2D>();
 		_orgGravityScale = _rigidBody.gravityScale;
+		targetScale = Time.timeScale;
 	}
 
 	public void Jump ()
@@ -59,6 +60,7 @@ public class SlowDownJump : MonoBehaviour {
 	public void Freeze(){
 		_rigidBody.gravityScale = 0;
 		_rigidBody.velocity = new Vector2(0,0);
+		TriggerSlowdown(false);
 	}
 
 	public void TriggerSlowdown(bool val){
@@ -70,7 +72,16 @@ public class SlowDownJump : MonoBehaviour {
 		print("trigger slow down: " + val);
 		_isSlowMotion = val;
 
-		Time.timeScale = val?slowDownAmount:1f;
-		Time.fixedDeltaTime = 0.02F * Time.timeScale;
+		targetScale = _isSlowMotion?slowDownAmount:1f;
+	}
+
+	float currVel;
+	float targetScale = 1;
+
+	void Update(){
+		if (Time.timeScale != targetScale){
+			Time.timeScale = Mathf.SmoothDamp(Time.timeScale, targetScale,ref currVel, 0.01f);
+			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+		}
 	}
 }

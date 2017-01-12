@@ -65,9 +65,9 @@ public class SRPlayer : MonoBehaviour {
 		if (tag == "Enemy"){
 
 			print("Enemy visibility change: " + isVisible);
-
-			if (isVisible){
-				_slowDownJump.TriggerSlowdown(true);	
+			if (_state == State.Jumping){
+				if (isVisible)
+					_slowDownJump.TriggerSlowdown(true);	
 			}
 		}
 	}
@@ -117,6 +117,27 @@ public class SRPlayer : MonoBehaviour {
 		OnJump();
 	}
 
+	void Die(GameObject other){
+
+		var grinder = other.gameObject.GetComponentInParent<Grinder>();
+
+		_slowDownJump.ResetPhysics();
+
+		_rigidBody.isKinematic = false;
+
+		_rigidBody.velocity = Vector2.zero;
+
+		LeanTween.move(gameObject, other.transform.position, 0.1f).setEase(LeanTweenType.easeInOutSine).setOnComplete(()=>{
+			grinder.OnKillPlayer();
+			transform.SetParent(other.transform);
+			FindObjectOfType<CameraFollow>().enabled = false;
+		});
+
+		_state = State.Dead;
+
+		OnDie();
+	}
+
 
 	void OnTriggerEnter2D(Collider2D other) {
 
@@ -126,11 +147,7 @@ public class SRPlayer : MonoBehaviour {
 
 		switch(other.tag){
 			case "Enemy":
-				gameObject.transform.position = other.gameObject.transform.position;
-				_slowDownJump.Freeze();
-				_state = State.Dead;
-				OnDie();
-
+				Die(other.gameObject);
 				break;
 			case"Jumper":
 				_slowDownJump.Jump();
@@ -148,6 +165,10 @@ public class SRPlayer : MonoBehaviour {
 				break;
 		}
 
+	}
+
+	public void OnNoEnemies(){
+		_slowDownJump.TriggerSlowdown(false);
 	}
 
 }

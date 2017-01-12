@@ -21,7 +21,7 @@ namespace GestureRecognizer
 		/// <param name="gesturePoint"></param>
 		/// <returns></returns>
 		public static Vector3 WorldCoordinateForGesturePoint(Vector3 gesturePoint) {
-			return Camera.main.ScreenToWorldPoint(new Vector3(gesturePoint.x, gesturePoint.y, 10));
+			return Camera.main.ScreenToWorldPoint(new Vector3(gesturePoint.x, gesturePoint.y, 8));
 		}
 
 	}
