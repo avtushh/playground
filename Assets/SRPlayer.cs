@@ -21,6 +21,8 @@ public class SRPlayer : MonoBehaviour {
 	public SpriteRenderer sprRenderer;
 	public Sprite sprNormal, sprJump;
 
+	public GameObject bloodParticles, trailParticles, grassParticles;
+
 	public float minRotationAngle = -60f, maxRotationAngle = 90f;
 
 	public enum State{
@@ -107,6 +109,7 @@ public class SRPlayer : MonoBehaviour {
 
 		sprRenderer.sprite = sprNormal;
 		_state = State.Sliding;
+		grassParticles.SetActive(true);
 		OnLand();
 	}
 
@@ -114,6 +117,7 @@ public class SRPlayer : MonoBehaviour {
 	{
 		sprRenderer.sprite = sprJump;
 		_state = State.Jumping;
+		grassParticles.SetActive(false);
 		OnJump();
 	}
 
@@ -123,7 +127,7 @@ public class SRPlayer : MonoBehaviour {
 
 		_slowDownJump.ResetPhysics();
 
-		_rigidBody.isKinematic = false;
+		_rigidBody.isKinematic = true;
 
 		_rigidBody.velocity = Vector2.zero;
 

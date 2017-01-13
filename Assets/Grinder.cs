@@ -21,7 +21,7 @@ public class Grinder : MonoBehaviour {
 
 	public Dictionary<string, GameObject> shapeToPrefab = new Dictionary<string, GameObject>();
 
-	public static string [] PREFABS_TYPES = {"triangle", "circle", "letterS", "number3", "number8"};
+	public static string [] PREFABS_TYPES = {"triangle", "circle", "s", "alpha", "number8"};
 
 	public static int lastTypeIndex = -1;
 
@@ -30,13 +30,12 @@ public class Grinder : MonoBehaviour {
 		shapeToPrefab.Add("triangle", trianglePrefab);
 		shapeToPrefab.Add("circle", circlePrefab);
 		shapeToPrefab.Add("s", letterEPrefab);
-		shapeToPrefab.Add("number3", number3Prefab);
+		shapeToPrefab.Add("alpha", number3Prefab);
 		shapeToPrefab.Add("number8", number8Prefab);
 
 		//type = shapeToPrefab.Keys.ElementAt(UnityEngine.Random.Range(0, shapeToPrefab.Keys.Count));
 
 		type = GetNextType();
-		type = "s";
 
 		var prefabToLoad = shapeToPrefab[type];
 
