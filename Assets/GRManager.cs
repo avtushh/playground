@@ -11,6 +11,7 @@ public class GRManager : MonoBehaviour {
 
 	public GestureBehaviour gestureBehaviour;
 	public GameObject gameOverCanvas;
+	public GameObject tapToSlide;
 
 
 	void Start(){
@@ -30,6 +31,7 @@ public class GRManager : MonoBehaviour {
 		player.OnJump += Player_OnJump;
 		player.OnLand += Player_OnLand;
 		player.OnDie += Player_OnDie;
+		player.OnStartSlide += () => tapToSlide.SetActive(false);
 	}
 
 	void RemoveListeners ()
@@ -41,6 +43,9 @@ public class GRManager : MonoBehaviour {
 		player.OnDie -= Player_OnDie;
 	}
 
+
+
+
 	IEnumerator CheckObstaclesForGesturesCoro(){
 		while(true){
 			yield return new WaitForSeconds(0.05f);
@@ -48,7 +53,7 @@ public class GRManager : MonoBehaviour {
 			var grinders = GetVisibleGrinders(false);
 			var shapesToFind = grinders.Select(item => item.type).ToList();
 
-			GestureBehaviour.shapesToFind = shapesToFind;
+			GestureBehaviour.shapesToFind = shapesToFind.Select(x => x.ToString()).ToList();
 		}
 	}
 
@@ -68,16 +73,14 @@ public class GRManager : MonoBehaviour {
 		var grinders = GetVisibleGrinders(false);
 
 		grinders.ForEach(grinder => {
-			var res = results.FirstOrDefault(x => x.Name == grinder.type);
+			var result = results.FirstOrDefault(x => x.Name == grinder.type.ToString());
 
-			if (res != null){
-				if (minScoreShape.Score > res.Score){
-					minScoreShape = res;
+			if (result != null){
+				if (minScoreShape.OriginalScore > result.OriginalScore){
+					minScoreShape = result;
 				}
 			}
 		});
-
-
 
 		bool didDestroy = DestroyEnemiesOfType (minScoreShape.Name);
 
@@ -121,9 +124,9 @@ public class GRManager : MonoBehaviour {
 	void Player_OnDie ()
 	{
 		Time.timeScale = 1f;
-		gameOverCanvas.SetActive(true);
 		gestureBehaviour.ClearGesture();
 		gestureBehaviour.gameObject.SetActive(false);
+		LeanTween.delayedCall(1f, ()=>gameOverCanvas.SetActive(true));
 	}
 
 	void Player_OnLand ()

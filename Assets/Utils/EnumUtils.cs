@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class EnumUtils {
 
@@ -11,6 +12,17 @@ public static class EnumUtils {
 		int minIndex = excludeFirstValue?1:0;
 
 		return (T) v.GetValue (new Random ().Next(minIndex, v.Length));
+	}
+
+	public static T RandomEnumValue<T> (T excludeType)
+	{
+		var v = Enum.GetValues (typeof (T));
+
+		var list = new List<T>((T[])v);
+
+		list.Remove(excludeType);
+
+		return (T) list.ElementAt (new Random ().Next(0, list.Count));
 	}
 
 	public static Array EnumValues<T> ()
@@ -39,6 +51,42 @@ public static class EnumUtils {
 			list[k] = list[n];  
 			list[n] = value;  
 		}  
+	}
+
+	public static IEnumerable<TValue> RandomValues<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+	{
+		Random rand = new Random();
+		List<TValue> values = Enumerable.ToList(dict.Values);
+		int size = dict.Count;
+		while(true)
+		{
+			yield return values[rand.Next(size)];
+		}
+	}
+
+	public static IEnumerable<TKey> RandomKeys<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+	{
+		Random rand = new Random();
+		List<TKey> values = Enumerable.ToList(dict.Keys);
+		int size = dict.Count;
+		while(true)
+		{
+			yield return values[rand.Next(size)];
+		}
+	}
+
+	public static List<TKey> RandomUniqueKeys<TKey, TValue>(this IDictionary<TKey, TValue> dict, int count)
+	{
+		List<TKey> values = Enumerable.ToList(dict.Keys);
+		int size = dict.Count;
+
+		values.Shuffle();
+
+		if (count >= values.Count){
+			return values;
+		}
+
+		return values.GetRange(0, count);
 	}
 
 }

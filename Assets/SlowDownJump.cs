@@ -11,8 +11,6 @@ public class SlowDownJump : MonoBehaviour {
 
 	public LayerMask collisionMask;
 
-	public float slowDownAmount = 0.2f;
-
 	Rigidbody2D _rigidBody;
 
 	bool _isSlowMotion;
@@ -46,7 +44,7 @@ public class SlowDownJump : MonoBehaviour {
 	public void ResetPhysics ()
 	{
 		print ("reset physics");
-		TriggerSlowdown(false);
+		TriggerSlowdown(1);
 
 		_rigidBody.isKinematic = false;
 
@@ -60,19 +58,11 @@ public class SlowDownJump : MonoBehaviour {
 	public void Freeze(){
 		_rigidBody.gravityScale = 0;
 		_rigidBody.velocity = new Vector2(0,0);
-		TriggerSlowdown(false);
+		TriggerSlowdown(1);
 	}
 
-	public void TriggerSlowdown(bool val){
-
-		if (val == _isSlowMotion){
-			return;
-		}
-
-		print("trigger slow down: " + val);
-		_isSlowMotion = val;
-
-		targetScale = _isSlowMotion?slowDownAmount:1f;
+	public void TriggerSlowdown(float scale){
+		targetScale = scale;
 	}
 
 	float currVel;

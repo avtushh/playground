@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GestureRecognizer
 {
@@ -44,27 +45,33 @@ namespace GestureRecognizer
 
 			List<Result> sortedResults = new List<Result>();
 
+			var gesturesToTest = Gestures.Where(g => shapesToFind.Contains(g.Name)).ToList();
+
 			// Compare gesture against all others
-			for (int i = 0; i < Gestures.Count; i++)
+			for (int i = 0; i < gesturesToTest.Count; i++)
 			{
-				distance = GreedyCloudMatch(gesture.NormalizedPoints, Gestures[i].NormalizedPoints);
+				distance = GreedyCloudMatch(gesture.NormalizedPoints, gesturesToTest[i].NormalizedPoints);
 				Result result = new Result();
 
-				result.Set(Gestures[i].Name, distance);
+				result.Set(gesturesToTest[i].Name, distance);
 				result.OriginalScore = distance;
 
-				result.Score = Mathf.Max((4 - result.Score) / 4, 0f);
+				float minScore = 4f;
+
+				result.Score = Mathf.Max((minScore - result.Score) / minScore, 0f);
 
 				if (result.Score > 0){
 
 					if (shapesToFind != null && shapesToFind.Count > 0){
 						if (shapesToFind.Contains(result.Name)){
+							Debug.LogWarning ("found shape " + result.Name + " with score: " + result.OriginalScore);
 							sortedResults.Add(result);	
-							return sortedResults;
 						}
 					}
 
 					sortedResults.Add(result);	
+				}else{
+					Debug.LogWarning ("score for shape " + result.Name + " not close enough: " + result.OriginalScore);
 				}			
 			}
 			sortedResults.Sort(CompareScores);

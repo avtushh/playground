@@ -9,6 +9,7 @@ public class SRPlayer : MonoBehaviour {
 	public event Action OnJump = () => {};
 	public event Action OnLand = () => {};
 	public event Action OnDie = () => {};
+	public event Action OnStartSlide = () => {};
 
 	public float speed = 1;
 
@@ -25,8 +26,11 @@ public class SRPlayer : MonoBehaviour {
 
 	public float minRotationAngle = -60f, maxRotationAngle = 90f;
 
+	public float baseTimeScale = 0.6f;
+	public float portraitTimeScale = 0.15f;
+
 	public enum State{
-		Sliding, Jumping, Dead
+		Idle, Sliding, Jumping, Dead
 	}
 
 	State _state;
@@ -46,14 +50,25 @@ public class SRPlayer : MonoBehaviour {
 
 		CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
 
-		var vel = _rigidBody.velocity;
 
-		vel.x = speed;
 
-		_rigidBody.velocity = vel;
+		_state = State.Idle;
+		trailParticles.SetActive(false);
 
-		_state = State.Sliding;
+
 	}
+
+	void StartSliding(){
+		_state = State.Sliding;
+		trailParticles.SetActive(true);
+
+		var vel = _rigidBody.velocity;
+		vel.x = speed;
+		_rigidBody.velocity = vel;
+		OnStartSlide();
+	}
+
+
 
 	void OnDestroy(){
 		_slowDownJump.JumpEvent -= OnJumpEvent;
@@ -65,40 +80,77 @@ public class SRPlayer : MonoBehaviour {
 	void CameraViewListener_onVisibilityChange (bool isVisible, string tag)
 	{
 		if (tag == "Enemy"){
+			if (isVisible){
+				numVisibleEnemies++;
+			}else{
+				numVisibleEnemies--;
+			}
 
-			print("Enemy visibility change: " + isVisible);
-			if (_state == State.Jumping){
-				if (isVisible)
-					_slowDownJump.TriggerSlowdown(true);	
+			if (numVisibleEnemies > 0){
+				
 			}
 		}
 	}
 
+	int numVisibleEnemies;
+
 
 	void Update(){
-		
-		if (_state == State.Sliding){
-			var vel = _rigidBody.velocity;
-			if (vel.x < speed){
-				vel.x = speed;
-				_rigidBody.velocity = vel;
-			}
 
-			var quaternion = transform.rotation;
+		switch(_state){
+			case State.Idle:
+				if (Input.GetMouseButtonDown(0)){
+					StartSliding();
+				}
+				break;
+			case State.Sliding:
+				
+				KeepMinXSpeed();
+				BalanceRotation();
 
-			var rotation = quaternion.eulerAngles;
+				break;
+			case State.Jumping:
+				
+				if (numVisibleEnemies > 0 && Time.timeScale == 1){
 
-			if (rotation.z > maxRotationAngle && rotation.z < 200){
-				rotation.z = maxRotationAngle;
-			}else if (rotation.z > 200 && rotation.z < 360-maxRotationAngle){
+					var scale = baseTimeScale;
 
-				rotation.z = 360-maxRotationAngle;
-			}
+					if (Screen.height > Screen.width){
+						scale = portraitTimeScale;
 
-			quaternion.eulerAngles = rotation;
+					}else{
+						scale = baseTimeScale - numVisibleEnemies * 0.1f;
+					}
 
-			transform.rotation = quaternion;
+					_slowDownJump.TriggerSlowdown(scale);
+				}
+				break;
 		}
+	}
+
+	void KeepMinXSpeed(){
+		var vel = _rigidBody.velocity;
+		if (vel.x < speed){
+			vel.x = speed;
+			_rigidBody.velocity = vel;
+		}
+	}
+
+	void BalanceRotation(){
+		var quaternion = transform.rotation;
+
+		var rotation = quaternion.eulerAngles;
+
+		if (rotation.z > maxRotationAngle && rotation.z < 200){
+			rotation.z = maxRotationAngle;
+		}else if (rotation.z > 200 && rotation.z < 360-maxRotationAngle){
+
+			rotation.z = 360-maxRotationAngle;
+		}
+
+		quaternion.eulerAngles = rotation;
+
+		transform.rotation = quaternion;
 	}
 
 	void OnLandEvent (GameObject collidedWithObj)
@@ -106,7 +158,7 @@ public class SRPlayer : MonoBehaviour {
 		if (_state != State.Jumping){
 			return;
 		}
-
+		LeanTween.delayedCall(gameObject, 0.1f, ()=>trailParticles.SetActive(true));
 		sprRenderer.sprite = sprNormal;
 		_state = State.Sliding;
 		grassParticles.SetActive(true);
@@ -115,6 +167,7 @@ public class SRPlayer : MonoBehaviour {
 
 	void OnJumpEvent ()
 	{
+		trailParticles.SetActive(false);
 		sprRenderer.sprite = sprJump;
 		_state = State.Jumping;
 		grassParticles.SetActive(false);
@@ -130,6 +183,8 @@ public class SRPlayer : MonoBehaviour {
 		_rigidBody.isKinematic = true;
 
 		_rigidBody.velocity = Vector2.zero;
+
+		trailParticles.SetActive(false);
 
 		LeanTween.move(gameObject, other.transform.position, 0.1f).setEase(LeanTweenType.easeInOutSine).setOnComplete(()=>{
 			grinder.OnKillPlayer();
@@ -172,7 +227,7 @@ public class SRPlayer : MonoBehaviour {
 	}
 
 	public void OnNoEnemies(){
-		_slowDownJump.TriggerSlowdown(false);
+		_slowDownJump.TriggerSlowdown(1f);
 	}
 
 }

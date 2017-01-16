@@ -14,6 +14,9 @@ public class EnemySpawner : MonoBehaviour {
 
 		int index = Random.Range(0, prefabs.Count);
 
+		//index = 2;
+
+
 		var go = Instantiate(prefabs[index], Vector3.zero, Quaternion.identity) as GameObject;
 
 		go.transform.SetParent(transform, false);

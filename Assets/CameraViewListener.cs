@@ -16,7 +16,7 @@ public class CameraViewListener : MonoBehaviour{
 	}
 
 	void Update(){
-		bool inCameraBounds = IsInCameraBounds();
+		bool inCameraBounds = IsInCameraBounds(true);
 
 		if (isVisible){
 			if (!inCameraBounds){
@@ -29,6 +29,10 @@ public class CameraViewListener : MonoBehaviour{
 		}
 		
 		isVisible = inCameraBounds;
+	}
+
+	void OnDestroy(){
+		onVisibilityChange(false, tag);
 	}
 
 	public bool IsInCameraBounds(bool addSafetlyDelta = false){
