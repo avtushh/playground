@@ -1,22 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GrinderGroup : MonoBehaviour {
+namespace TabTale
+{
+	public class GrinderGroup : MonoBehaviour
+	{
 
-	public ShapesList shapesList;
+		public ShapesList shapesList;
 
 
-	void Awake(){
-		var grinders = GetComponentsInChildren<Grinder>();
+		void Awake ()
+		{
+			var grinders = GetComponentsInChildren<Grinder> ();
 
-		var randomShapes = shapesList.GetRandomShapes(grinders.Length);
+			var randomShapes = shapesList.GetRandomShapes (grinders.Length);
 
-		for (int i = 0; i < grinders.Length; i++) {
+			for (int i = 0; i < grinders.Length; i++) {
 
-			var shape = randomShapes[i];
-			var prefab = shapesList.prefabByNameDict[shape];
+				var shape = randomShapes [i];
+				var prefab = shapesList.prefabByNameDict [shape];
 
-			grinders[i].SetShapeAndType(shape, prefab);
+				grinders [i].SetShapeAndType (shape, prefab);
+			}
 		}
 	}
 }

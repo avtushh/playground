@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-
+namespace TabTale
+{
 public class FollowTimeScale : MonoBehaviour {
 
 	Text txt;
@@ -15,4 +16,5 @@ public class FollowTimeScale : MonoBehaviour {
 	}
 
 
+}
 }

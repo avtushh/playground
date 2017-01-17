@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System;
-
+namespace TabTale
+{
 [RequireComponent(typeof(Renderer))]
 public class CameraViewListener : MonoBehaviour{
 
@@ -54,4 +55,5 @@ public class CameraViewListener : MonoBehaviour{
 
 		return true;
 	}
+}
 }

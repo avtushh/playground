@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+namespace TabTale
+{
 public static class EnumUtils {
 
 	public static T RandomEnumValue<T> (bool excludeFirstValue = false)
@@ -89,4 +90,5 @@ public static class EnumUtils {
 		return values.GetRange(0, count);
 	}
 
+}
 }

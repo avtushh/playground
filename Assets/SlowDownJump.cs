@@ -4,74 +4,82 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-public class SlowDownJump : MonoBehaviour {
-
-	public event Action JumpEvent = () => {};
-	public event Action<GameObject> LandEvent = (s) => {};
-
-	public LayerMask collisionMask;
-
-	Rigidbody2D _rigidBody;
-
-	bool _isSlowMotion;
-
-	float _orgVelX; 
-	float _orgGravityScale;
-
-	void Awake(){
-		_rigidBody = GetComponent<Rigidbody2D>();
-		_orgGravityScale = _rigidBody.gravityScale;
-		targetScale = Time.timeScale;
-	}
-
-	public void Jump ()
+namespace TabTale
+{
+	public class SlowDownJump : MonoBehaviour
 	{
-		_orgVelX = _rigidBody.velocity.x;
-		print("jump!");
-		_rigidBody.gravityScale = 3;
-		_rigidBody.velocity = new Vector2(_orgVelX / 5f, 15);
 
-		LeanTween.delayedCall(0.2f, () =>JumpEvent());
-	}
+		public event Action JumpEvent = () => {};
+		public event Action<GameObject> LandEvent = (s) => {};
 
-	public void Land (Collision2D coll)
-	{
-		ResetPhysics ();
+		public LayerMask collisionMask;
 
-		LandEvent (coll.gameObject);
-	}
+		Rigidbody2D _rigidBody;
 
-	public void ResetPhysics ()
-	{
-		print ("reset physics");
-		TriggerSlowdown(1);
+		bool _isSlowMotion;
 
-		_rigidBody.isKinematic = false;
+		float _orgVelX;
+		float _orgGravityScale;
 
-		_rigidBody.gravityScale = _orgGravityScale;
-		var vel = _rigidBody.velocity;
-		vel.x = _orgVelX;
-		_rigidBody.velocity = vel;
+		void Awake ()
+		{
+			_rigidBody = GetComponent<Rigidbody2D> ();
+			_orgGravityScale = _rigidBody.gravityScale;
+			targetScale = Time.timeScale;
+		}
 
-	}
+		public void Jump ()
+		{
+			_orgVelX = _rigidBody.velocity.x;
+			print ("jump!");
+			_rigidBody.gravityScale = 3;
+			_rigidBody.velocity = new Vector2 (_orgVelX / 5f, 15);
 
-	public void Freeze(){
-		_rigidBody.gravityScale = 0;
-		_rigidBody.velocity = new Vector2(0,0);
-		TriggerSlowdown(1);
-	}
+			LeanTween.delayedCall (0.2f, () => JumpEvent ());
+		}
 
-	public void TriggerSlowdown(float scale){
-		targetScale = scale;
-	}
+		public void Land (Collision2D coll)
+		{
+			ResetPhysics ();
 
-	float currVel;
-	float targetScale = 1;
+			LandEvent (coll.gameObject);
+		}
 
-	void Update(){
-		if (Time.timeScale != targetScale){
-			Time.timeScale = Mathf.SmoothDamp(Time.timeScale, targetScale,ref currVel, 0.01f);
-			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+		public void ResetPhysics ()
+		{
+			print ("reset physics");
+			TriggerSlowdown (1);
+
+			_rigidBody.isKinematic = false;
+
+			_rigidBody.gravityScale = _orgGravityScale;
+			var vel = _rigidBody.velocity;
+			vel.x = _orgVelX;
+			_rigidBody.velocity = vel;
+
+		}
+
+		public void Freeze ()
+		{
+			_rigidBody.gravityScale = 0;
+			_rigidBody.velocity = new Vector2 (0, 0);
+			TriggerSlowdown (1);
+		}
+
+		public void TriggerSlowdown (float scale)
+		{
+			targetScale = scale;
+		}
+
+		float currVel;
+		float targetScale = 1;
+
+		void Update ()
+		{
+			if (Time.timeScale != targetScale) {
+				Time.timeScale = Mathf.SmoothDamp (Time.timeScale, targetScale, ref currVel, 0.01f);
+				Time.fixedDeltaTime = 0.02F * Time.timeScale;
+			}
 		}
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-
+namespace TabTale{
 public class Grinder : MonoBehaviour {
 
 	public Shape shape; 
@@ -63,3 +63,4 @@ public class Grinder : MonoBehaviour {
 }
 
 
+}

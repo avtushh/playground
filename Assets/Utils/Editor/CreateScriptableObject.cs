@@ -2,18 +2,22 @@
 using System.Collections;
 using UnityEditor;
 
-public class CreateScriptableObject {
-
-	[MenuItem("Assets/Create/ShapesObject")]
-	public static void CreateMyAsset()
+namespace TabTale
+{
+	public class CreateScriptableObject
 	{
-		ShapesList asset = ScriptableObject.CreateInstance<ShapesList>();
 
-		AssetDatabase.CreateAsset(asset, "Assets/GrindMe/ShapesList.asset");
-		AssetDatabase.SaveAssets();
+		[MenuItem ("Assets/Create/ShapesObject")]
+		public static void CreateMyAsset ()
+		{
+			ShapesList asset = ScriptableObject.CreateInstance<ShapesList> ();
 
-		EditorUtility.FocusProjectWindow();
+			AssetDatabase.CreateAsset (asset, "Assets/GrindMe/ShapesList.asset");
+			AssetDatabase.SaveAssets ();
 
-		Selection.activeObject = asset;
+			EditorUtility.FocusProjectWindow ();
+
+			Selection.activeObject = asset;
+		}
 	}
 }
