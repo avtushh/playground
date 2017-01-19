@@ -539,6 +539,8 @@ public abstract partial class Terrain2D : MonoBehaviour
 
     public void UpdateAllChunkMeshes()
     {
+		//Debug.LogError("update meshess");
+
         for (int i = 0; i < controlPoints.Count - 1; i += 3)
         {
             UpdateChunkMesh(i);
@@ -1060,6 +1062,7 @@ public abstract partial class Terrain2D : MonoBehaviour
             {
                 GameObject collider = new GameObject();
                 collider.name = "Collider";
+				collider.tag = "Platform";
                 collider.transform.parent = chunk.chunkObject.transform;
                 collider.transform.localPosition = new Vector3(0f, 0f, 0f);
                 collider.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
@@ -1076,6 +1079,7 @@ public abstract partial class Terrain2D : MonoBehaviour
             {
                 GameObject collider = new GameObject();
                 collider.name = "Collider";
+				collider.tag = "Platform";
                 collider.transform.parent = chunk.chunkObject.transform;
                 collider.transform.localPosition = new Vector3(0f, 0f, 0f);
                 collider.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
@@ -1095,7 +1099,6 @@ public abstract partial class Terrain2D : MonoBehaviour
             UpdateChunkColliderHolder(i);
         }
     }
-
 
     private void Collider2D(int index)
     {
@@ -1129,7 +1132,9 @@ public abstract partial class Terrain2D : MonoBehaviour
         if (undo) Undo.RecordObject(chunks[(int)((index + 1) / 3)].chunkObject.transform.FindChild("Collider").GetComponent<EdgeCollider2D>(), "Edge Collider");
         #endif
 
-        chunks[(int)((index + 1) / 3)].chunkObject.transform.FindChild("Collider").GetComponent<EdgeCollider2D>().points = newPoints.ToArray();
+		var colliderTransform = chunks [(int)((index + 1) / 3)].chunkObject.transform.FindChild ("Collider");
+		colliderTransform.tag = "Platform";
+		colliderTransform.GetComponent<EdgeCollider2D>().points = newPoints.ToArray();
     }
 
     private void Collider3D(int index, List<Mesh> meshColliders)
@@ -1292,14 +1297,14 @@ public abstract partial class Terrain2D : MonoBehaviour
                     renderedCurves.Add((int)(i - 1) / 3);
                 }
 
-                if (viewPosition.x < -0.5f || viewPosition.x > 1.5f)
-                {
-                    chunks[(int)(i - 1) / 3].chunkObject.transform.FindChild("Mesh").gameObject.SetActive(false);
-                    chunks[(int)(i - 1) / 3].chunkObject.transform.FindChild("Prefabs").gameObject.SetActive(false);
-                    chunks[(int)(i - 1) / 3].chunkObject.transform.FindChild("Collider").gameObject.SetActive(false);
-
-                    lastRenderedCurve = (int)(i - 1) / 3;
-                }
+//                if (viewPosition.x < -0.5f || viewPosition.x > 1.5f)
+//                {
+//                    chunks[(int)(i - 1) / 3].chunkObject.transform.FindChild("Mesh").gameObject.SetActive(false);
+//                    chunks[(int)(i - 1) / 3].chunkObject.transform.FindChild("Prefabs").gameObject.SetActive(false);
+//                    chunks[(int)(i - 1) / 3].chunkObject.transform.FindChild("Collider").gameObject.SetActive(false);
+//
+//                    lastRenderedCurve = (int)(i - 1) / 3;
+//                }
             }
         }
     }
@@ -1314,12 +1319,12 @@ public abstract partial class Terrain2D : MonoBehaviour
 
                 if (viewPosition.x < -0.5f)
                 {
-                    chunks[renderedCurves[0]].chunkObject.transform.FindChild("Mesh").gameObject.SetActive(false);
-                    chunks[renderedCurves[0]].chunkObject.transform.FindChild("Prefabs").gameObject.SetActive(false);
-                    chunks[renderedCurves[0]].chunkObject.transform.FindChild("Collider").gameObject.SetActive(false);
+//                    chunks[renderedCurves[0]].chunkObject.transform.FindChild("Mesh").gameObject.SetActive(false);
+//                    chunks[renderedCurves[0]].chunkObject.transform.FindChild("Prefabs").gameObject.SetActive(false);
+//                    chunks[renderedCurves[0]].chunkObject.transform.FindChild("Collider").gameObject.SetActive(false);
 
-                    lastRenderedCurve = renderedCurves[0];
-                    renderedCurves.RemoveAt(0);               
+//                    lastRenderedCurve = renderedCurves[0];
+//                    renderedCurves.RemoveAt(0);               
                 }          
             }
 
@@ -1367,12 +1372,12 @@ public abstract partial class Terrain2D : MonoBehaviour
                 {
                     if (chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Mesh").gameObject.activeSelf == true)
                     {
-                        chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Mesh").gameObject.SetActive(false);
-                        chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Prefabs").gameObject.SetActive(false);
-                        chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Collider").gameObject.SetActive(false);
-
-                        lastRenderedCurve = renderedCurves[renderedCurves.Count - 1];
-                        renderedCurves.RemoveAt(renderedCurves.Count - 1);
+//                        chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Mesh").gameObject.SetActive(false);
+//                        chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Prefabs").gameObject.SetActive(false);
+//                        chunks[renderedCurves[renderedCurves.Count - 1]].chunkObject.transform.FindChild("Collider").gameObject.SetActive(false);
+//
+//                        lastRenderedCurve = renderedCurves[renderedCurves.Count - 1];
+//                        renderedCurves.RemoveAt(renderedCurves.Count - 1);
                     }
                 }
             }

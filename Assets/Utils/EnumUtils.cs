@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
+
 namespace TabTale
 {
 public static class EnumUtils {
@@ -89,6 +92,24 @@ public static class EnumUtils {
 
 		return values.GetRange(0, count);
 	}
+
+		public static string ToCommaSeparatedString<T>(this List<T> list){
+			StringBuilder sb = new StringBuilder();
+
+			for (int i = 0; i < list.Count; i++) {
+				var obj = list[i];
+
+				if (i > 0){
+					sb.Append(", ");
+				}
+
+				sb.Append(obj.ToString());
+
+
+			}
+
+			return sb.ToString();
+		}
 
 }
 }

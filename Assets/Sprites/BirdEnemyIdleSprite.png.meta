@@ -25,7 +25,7 @@ TextureImporter:
   cubemapConvolutionSteps: 8
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
-  textureFormat: -1
+  textureFormat: -3
   maxTextureSize: 1024
   textureSettings:
     filterMode: -1
@@ -48,8 +48,10 @@ TextureImporter:
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: EnemyIdleSprite_0
+    - serializedVersion: 2
+      name: EnemyIdleSprite_0
       rect:
         serializedVersion: 2
         x: 7
@@ -59,15 +61,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: 42.5, y: 33.5}
-        - {x: -21.5, y: 33.5}
-        - {x: -56.5, y: 10.5}
-        - {x: -56.5, y: -26.5}
-        - {x: -30.5, y: -33.5}
-        - {x: 56.5, y: -33.5}
-        - {x: 56.5, y: 22.5}
-        - {x: 45.5, y: 32.5}
+      outline: []
     outline: []
   spritePackingTag: 
   userData: 

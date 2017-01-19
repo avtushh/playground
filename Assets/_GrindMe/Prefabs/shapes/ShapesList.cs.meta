@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 946aa5b51a62f4691ba0ed65c136d68b
+timeCreated: 1484818901
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - circle: {fileID: 145876, guid: 08fd7cd6b1fd84e08a0a59a912484825, type: 2}
+  - infinity: {fileID: 141296, guid: b5e399f73cad24978bf8cca654a80b6e, type: 2}
+  - letter_e: {fileID: 108328, guid: 68b9543504bff4169b336664da066a99, type: 2}
+  - triangle: {fileID: 124312, guid: 7f27890801a9b4a0594c42966d7d35ea, type: 2}
+  - alpha: {fileID: 183042, guid: 677784c37b7884463ba19210c8cb8e5f, type: 2}
+  - line: {fileID: 111526, guid: 25d3384bd0f834b51b6d7bf12ff08f0b, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

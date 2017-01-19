@@ -28,27 +28,28 @@ namespace TabTale
 			targetScale = Time.timeScale;
 		}
 
-		public void Jump ()
+		public void Jump (float landVel, float velX = 7f, float velY = 10f, float gravityScale = 2f)
 		{
-			_orgVelX = _rigidBody.velocity.x;
-			print ("jump!");
-			_rigidBody.gravityScale = 3;
-			_rigidBody.velocity = new Vector2 (_orgVelX / 5f, 15);
+			TriggerSlowdown(1f);
+			_orgVelX = landVel;
+			_rigidBody.gravityScale = gravityScale;
+			_rigidBody.velocity = new Vector2 (velX, velY);
 
 			LeanTween.delayedCall (0.2f, () => JumpEvent ());
 		}
 
-		public void Land (Collision2D coll)
+		public void Land (Collision2D coll, bool resetTime = true)
 		{
-			ResetPhysics ();
+			ResetPhysics (resetTime);
 
 			LandEvent (coll.gameObject);
 		}
 
-		public void ResetPhysics ()
+		public void ResetPhysics (bool resetTime = true)
 		{
 			print ("reset physics");
-			TriggerSlowdown (1);
+			if (resetTime)
+				TriggerSlowdown (1);
 
 			_rigidBody.isKinematic = false;
 
@@ -56,7 +57,6 @@ namespace TabTale
 			var vel = _rigidBody.velocity;
 			vel.x = _orgVelX;
 			_rigidBody.velocity = vel;
-
 		}
 
 		public void Freeze ()
@@ -66,8 +66,17 @@ namespace TabTale
 			TriggerSlowdown (1);
 		}
 
+		float lastScale = 1f;
+
 		public void TriggerSlowdown (float scale)
 		{
+//			_rigidBody.gravityScale /= (lastScale*lastScale);
+//			_rigidBody.velocity /= lastScale;
+//
+//			_rigidBody.gravityScale *= (scale*scale);
+//			_rigidBody.velocity *= scale;
+//			lastScale = scale;
+
 			targetScale = scale;
 		}
 

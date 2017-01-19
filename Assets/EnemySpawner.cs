@@ -2,28 +2,33 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class EnemySpawner : MonoBehaviour {
+namespace TabTale
+{
+	public class EnemySpawner : MonoBehaviour
+	{
+		public List<GameObject> prefabs;
+	
+		public Shape forcedShape = Shape.None;
 
-	public List<GameObject> prefabs;
+		void Start ()
+		{
+			SpawnEnemy ();
+			//SpawnEnemy();
+		}
 
-	void Awake(){
-		SpawnEnemy();
+		void SpawnEnemy ()
+		{
+	
+			int index = Random.Range (0, prefabs.Count);
+	
+			//index = 2;
+	
+	
+			var go = Instantiate (prefabs [index], Vector3.zero, Quaternion.identity) as GameObject;
+	
+			go.transform.SetParent (transform, false);
+
+			go.GetComponent<GrinderGroup>().forcedShape = forcedShape;
+		}
 	}
-
-	void SpawnEnemy(){
-
-		int index = Random.Range(0, prefabs.Count);
-
-		//index = 2;
-
-
-		var go = Instantiate(prefabs[index], Vector3.zero, Quaternion.identity) as GameObject;
-
-		go.transform.SetParent(transform, false);
-
-
-	}
-
-
-
 }

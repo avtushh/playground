@@ -9,12 +9,13 @@ namespace TabTale
 {
 	public class GRManager : MonoBehaviour
 	{
-
 		public SRPlayer player;
 
 		public GestureBehaviour gestureBehaviour;
 		public GameObject gameOverCanvas;
 		public GameObject tapToSlide;
+
+		public List<ShapeDataComponent> visibleShapes;
 
 
 		void Start ()
@@ -33,22 +34,48 @@ namespace TabTale
 		{
 			//GestureBehaviour.OnGestureRecognition += OnGestureResult;
 			GestureBehaviour.OnGesturesRecognition += OnGesturessResult;
-			player.OnJump += Player_OnJump;
 			player.OnLand += Player_OnLand;
 			player.OnDie += Player_OnDie;
+			player.OnDanger += Player_OnDanger;
 			player.OnStartSlide += () => tapToSlide.SetActive (false);
+			CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
 		}
+
 
 		void RemoveListeners ()
 		{
 			GestureBehaviour.OnGesturesRecognition -= OnGesturessResult;
-
-			player.OnJump -= Player_OnJump;
 			player.OnLand -= Player_OnLand;
 			player.OnDie -= Player_OnDie;
+			player.OnSlowDown -= Player_OnDanger;
+			CameraViewListener.onVisibilityChange -= CameraViewListener_onVisibilityChange;
+
+		}
+
+		void CameraViewListener_onVisibilityChange (bool visible, GameObject gameObject)
+		{
+			if (gameObject.tag == GrindMeTags.Shape){
+
+				var shapeHolder = gameObject.GetComponent<ShapeDataComponent>();
+				if (visible){
+					visibleShapes.Add(shapeHolder);
+				}else{
+					visibleShapes.Remove(shapeHolder);
+
+					if (visibleShapes.Count == 0){
+
+						if (gestureBehaviour != null && gestureBehaviour.gameObject != null)
+							gestureBehaviour.gameObject.SetActive (false);
+					}
+				}
+			}
 		}
 
 
+		void Player_OnDanger ()
+		{
+			gestureBehaviour.gameObject.SetActive (true);
+		}
 
 
 		IEnumerator CheckObstaclesForGesturesCoro ()
@@ -56,31 +83,24 @@ namespace TabTale
 			while (true) {
 				yield return new WaitForSeconds (0.05f);
 
-				var grinders = GetVisibleGrinders (false);
-				var shapesToFind = grinders.Select (item => item.type).ToList ();
+				var shapesToFind = visibleShapes.Select (item => item.Type).ToList ();
 
-				GestureBehaviour.shapesToFind = shapesToFind.Select (x => x.ToString ()).ToList ();
+				GestureBehaviour.shapesToFind = shapesToFind;
 			}
-		}
-
-		public List<Grinder> GetVisibleGrinders (bool addSafety)
-		{
-			return FindObjectsOfType<Grinder> ().Where (x => x.IsVisible (addSafety)).ToList ();
 		}
 
 		void OnGesturessResult (Gesture gesture, List<Result> results)
 		{
 			gestureBehaviour.ClearGesture ();
+
 			if (results == null || results.Count == 0) {
 				return;
 			}
 
 			Result minScoreShape = new Result ();
 
-			var grinders = GetVisibleGrinders (false);
-
-			grinders.ForEach (grinder => {
-				var result = results.FirstOrDefault (x => x.Name == grinder.type.ToString ());
+			visibleShapes.ForEach (shape => {
+				var result = results.FirstOrDefault (x => x.Name == shape.Type);
 
 				if (result != null) {
 					if (minScoreShape.OriginalScore > result.OriginalScore) {
@@ -90,42 +110,22 @@ namespace TabTale
 			});
 
 			bool didDestroy = DestroyEnemiesOfType (minScoreShape.Name);
-
-			if (didDestroy) {
-				CheckNoEnemies ();
-			}
-		}
-
-		void CheckNoEnemies ()
-		{
-			var grinders = GetVisibleGrinders (false).Where (x => x.isAlive).ToList ();
-			if (grinders == null || grinders.Count == 0) {
-				player.OnNoEnemies ();
-
-			}
 		}
 
 		bool DestroyEnemiesOfType (string name)
 		{
-			print ("Check shape: " + name);
-			var grindersWithShape = GetVisibleGrinders (false).Where (x => x.type == name).ToList ();
-			if (grindersWithShape.Count > 0) {
-				print ("Found shape: " + name);
-				grindersWithShape.ForEach (g => {
-					g.Kill ();
-				});
+			
+
+			var enemy = player.GetClosestEnemy(name);
+
+			if (enemy != null){
+				Debug.LogWarning("******* WANT TO DESTROY shape: " + name + " ,found shape: " + enemy.shapeData.Type);
+				enemy.shapeData.Activate();
 				return true;
-			} else {
-				return false;
-				print ("try again");
 			}
 
-
-
+			return false;
 		}
-
-
-
 
 		void Player_OnDie ()
 		{
@@ -138,12 +138,6 @@ namespace TabTale
 		void Player_OnLand ()
 		{
 			gestureBehaviour.gameObject.SetActive (false);
-		}
-
-		void Player_OnJump ()
-		{
-			gestureBehaviour.gameObject.SetActive (true);
-
 		}
 	}
 }

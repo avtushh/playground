@@ -12,7 +12,7 @@ namespace TabTale
 		{
 			ShapesList asset = ScriptableObject.CreateInstance<ShapesList> ();
 
-			AssetDatabase.CreateAsset (asset, "Assets/GrindMe/ShapesList.asset");
+			AssetDatabase.CreateAsset (asset, "Assets/_GrindMe/ShapesList.asset");
 			AssetDatabase.SaveAssets ();
 
 			EditorUtility.FocusProjectWindow ();

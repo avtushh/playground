@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using TabTale;
 
 namespace GestureRecognizer
 {
@@ -39,7 +41,7 @@ namespace GestureRecognizer
 			return result;
 		}
 
-		public List<Result> RecognizeAll(Gesture gesture, List<string> shapesToFind) {
+		public List<Result> RecognizeAll(Gesture gesture, List<string> shapesToFind, StringBuilder sb) {
 
 			float distance = float.MaxValue;
 
@@ -47,16 +49,26 @@ namespace GestureRecognizer
 
 			var gesturesToTest = Gestures.Where(g => shapesToFind.Contains(g.Name)).ToList();
 
+			sb.AppendLine("testing: " + shapesToFind.ToCommaSeparatedString());
+
+
+
 			// Compare gesture against all others
 			for (int i = 0; i < gesturesToTest.Count; i++)
 			{
+				iterations = 0;
+				sb.AppendLine("test shape " + gesturesToTest[i].Name + " points to compare: " + gesture.NormalizedPoints.Count());
 				distance = GreedyCloudMatch(gesture.NormalizedPoints, gesturesToTest[i].NormalizedPoints);
 				Result result = new Result();
 
 				result.Set(gesturesToTest[i].Name, distance);
 				result.OriginalScore = distance;
 
+				#if UNITY_EDITOR
 				float minScore = 4f;
+				#else
+				float minScore = 3f;
+				#endif
 
 				result.Score = Mathf.Max((minScore - result.Score) / minScore, 0f);
 
@@ -64,17 +76,20 @@ namespace GestureRecognizer
 
 					if (shapesToFind != null && shapesToFind.Count > 0){
 						if (shapesToFind.Contains(result.Name)){
-							Debug.LogWarning ("found shape " + result.Name + " with score: " + result.OriginalScore);
+							sb.AppendLine("found shape " + result.Name + " with score: " + result.OriginalScore);
 							sortedResults.Add(result);	
 						}
 					}
 
 					sortedResults.Add(result);	
 				}else{
-					Debug.LogWarning ("score for shape " + result.Name + " not close enough: " + result.OriginalScore);
+					sb.AppendLine("score for shape " + result.Name + " not close enough: " + result.OriginalScore);
 				}			
 			}
+
 			sortedResults.Sort(CompareScores);
+
+			sb.AppendLine("total iterations: " + iterations);
 
 			return sortedResults;
 		}
@@ -109,7 +124,7 @@ namespace GestureRecognizer
 				
 				float distance1 = CloudDistance(points1, points2, i);
 				float distance2 = CloudDistance(points2, points1, i);
-				minDistance = Mathf.Min(minDistance, Mathf.Min(distance1, distance2));
+				minDistance = Mathf.Min(minDistance, distance1, distance2);
 			}
 			return minDistance;
 		}
@@ -124,12 +139,13 @@ namespace GestureRecognizer
 			int i = startIndex;
 
 			do {
-				iterations++;
+				
 
 				int index = -1;
 				float minDistance = float.MaxValue;
 
 				for (int j = 0; j < points1.Length; j++) {
+					iterations++;
 					if (!matched[j]) {
 						float distance = Vector2.Distance(points1[i].Position, points2[j].Position);
 						if (distance < minDistance) {

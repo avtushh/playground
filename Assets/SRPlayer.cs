@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TabTale
 {
@@ -9,10 +11,12 @@ namespace TabTale
 	public class SRPlayer : MonoBehaviour
 	{
 
-		public event Action OnJump = () => {};
 		public event Action OnLand = () => {};
 		public event Action OnDie = () => {};
+
+		public event Action OnSlowDown = () => {};
 		public event Action OnStartSlide = () => {};
+		public event Action OnDanger = () => {};
 
 		public float speed = 1;
 
@@ -32,6 +36,10 @@ namespace TabTale
 		public float baseTimeScale = 0.6f;
 		public float portraitTimeScale = 0.15f;
 
+		List<Transform> shapes = new List<Transform>();
+
+		int numVisibleEnemies;
+
 		public enum State
 		{
 			Idle,
@@ -42,6 +50,14 @@ namespace TabTale
 
 		State _state;
 
+		public State CurrState{
+			get{
+				return _state;
+			}
+		}
+
+		bool _isInDanger;
+
 		void Awake ()
 		{
 			_rigidBody = GetComponent<Rigidbody2D> ();
@@ -50,7 +66,6 @@ namespace TabTale
 			sprRenderer.sprite = sprNormal;
 		}
 
-		// Use this for initialization
 		void Start ()
 		{
 
@@ -59,12 +74,8 @@ namespace TabTale
 
 			CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
 
-
-
 			_state = State.Idle;
 			trailParticles.SetActive (false);
-
-
 		}
 
 		void StartSliding ()
@@ -88,27 +99,25 @@ namespace TabTale
 			CameraViewListener.onVisibilityChange -= CameraViewListener_onVisibilityChange;
 		}
 
-		void CameraViewListener_onVisibilityChange (bool isVisible, string tag)
+		void CameraViewListener_onVisibilityChange (bool isVisible, GameObject obj)
 		{
-			if (tag == "Enemy") {
+			if (obj.tag == GrindMeTags.Shape) {
 				if (isVisible) {
+					shapes.Add(obj.transform);
 					numVisibleEnemies++;
 				} else {
+					shapes.Remove(obj.transform);
 					numVisibleEnemies--;
 				}
-
-				if (numVisibleEnemies > 0) {
-				
-				}
+			}else if (obj.tag == GrindMeTags.Jumper){
+				hasJumper = isVisible;
 			}
 		}
 
-		int numVisibleEnemies;
-
+		bool hasJumper = false;
 
 		void Update ()
 		{
-
 			switch (_state) {
 				case State.Idle:
 					if (Input.GetMouseButtonDown (0)) {
@@ -119,25 +128,117 @@ namespace TabTale
 				
 					KeepMinXSpeed ();
 					BalanceRotation ();
-
+					if (!hasJumper)
+						CheckSlowDown();
 					break;
 				case State.Jumping:
-				
-					if (numVisibleEnemies > 0 && Time.timeScale == 1) {
-
-						var scale = baseTimeScale;
-
-						if (Screen.height > Screen.width) {
-							scale = portraitTimeScale;
-
-						} else {
-							scale = baseTimeScale - numVisibleEnemies * 0.1f;
-						}
-
-						_slowDownJump.TriggerSlowdown (scale);
-					}
+					CheckSlowDown();
 					break;
 			}
+		}
+
+		public class ClosestShape{
+			public ShapeDataComponent shapeData; 
+			public float distance;
+			public GrinderGroup grinderGroup;
+		}
+
+		public ClosestShape GetClosestEnemy(string shapeName = null){
+
+			ClosestShape closestEnemy = null;
+			float minDistance = Mathf.Infinity;
+
+			shapes.ForEach(x => {
+
+				if (x.position.x > transform.position.x - 1){
+					var dist = Vector3.Distance(x.position, transform.position);
+
+					if (dist < minDistance)	{
+
+						var shapeData = x.GetComponent<ShapeDataComponent>();
+
+						if (shapeName == null || shapeData.Type == shapeName){
+							if (closestEnemy == null){
+								closestEnemy = new ClosestShape();
+							}
+							closestEnemy.shapeData = shapeData;
+							minDistance = dist;
+						}
+					}
+				}
+			});
+
+			if (closestEnemy != null){
+				closestEnemy.distance = minDistance;
+				closestEnemy.grinderGroup = closestEnemy.shapeData.GetComponentInParent<GrinderGroup>();
+			}
+
+			return closestEnemy;
+		}
+
+		public float closetsEnemyDistance;
+
+		void CheckSlowDown(){
+			if (numVisibleEnemies > 0) {
+
+				var closetsEnemy = GetClosestEnemy();
+				if (closetsEnemy != null){
+					closetsEnemyDistance = closetsEnemy.distance;
+
+					var slowDownDistance = 7.8f;
+					var dangerDistance = 8f;
+
+					if (closetsEnemyDistance < slowDownDistance){
+						TriggerSlowDownMode (GetSlowDownScale (closetsEnemy));
+						OnDanger();
+						_isInDanger = true;
+					}else if (closetsEnemyDistance < dangerDistance){
+						TriggerSlowDownMode (1f);
+						OnDanger();
+						_isInDanger = true;
+					}else{
+						TriggerSlowDownMode (1f);
+						_isInDanger = false;
+					}
+				}
+			}else{
+				if (Time.timeScale < 1){
+					TriggerSlowDownMode(1f);
+					sprRenderer.sprite = sprNormal;
+				}
+			}
+		}
+
+
+
+		float GetSlowDownScale (ClosestShape closestEnemy)
+		{
+			if (closestEnemy.distance < 6){
+				return 0.15f;
+			}
+			var slowScale = 0.2f;
+			if (_state == State.Sliding) {
+				
+				if (closestEnemy.grinderGroup != null && closestEnemy.grinderGroup.forcedShape == Shape.line) {
+					slowScale = 0.7f;
+				}
+				else {
+					slowScale = 0.2f;
+				}
+			}
+			return slowScale;
+		}
+
+		void TriggerSlowDownMode (float scale)
+		{
+			
+			sprRenderer.sprite = scale == 1?sprNormal:sprJump;
+			_slowDownJump.TriggerSlowdown (scale);
+
+			trailParticles.SetActive (scale == 1);
+
+			if (scale < 1)
+				OnSlowDown ();
 		}
 
 		void KeepMinXSpeed ()
@@ -145,8 +246,12 @@ namespace TabTale
 			var vel = _rigidBody.velocity;
 			if (vel.x < speed) {
 				vel.x = speed;
-				_rigidBody.velocity = vel;
+			}else if (vel.x > maxSpeed){
+				vel.x = maxSpeed;
 			}
+
+			_rigidBody.velocity = vel;
+
 		}
 
 		void BalanceRotation ()
@@ -172,7 +277,8 @@ namespace TabTale
 			if (_state != State.Jumping) {
 				return;
 			}
-			LeanTween.delayedCall (gameObject, 0.1f, () => trailParticles.SetActive (true));
+
+			trailParticles.SetActive (true);
 			sprRenderer.sprite = sprNormal;
 			_state = State.Sliding;
 			grassParticles.SetActive (true);
@@ -182,15 +288,15 @@ namespace TabTale
 		void OnJumpEvent ()
 		{
 			trailParticles.SetActive (false);
-			sprRenderer.sprite = sprJump;
+
 			_state = State.Jumping;
 			grassParticles.SetActive (false);
-			OnJump ();
+
+
 		}
 
 		void Die (GameObject other)
 		{
-
 			var grinder = other.gameObject.GetComponentInParent<Grinder> ();
 
 			_slowDownJump.ResetPhysics ();
@@ -209,23 +315,28 @@ namespace TabTale
 
 			_state = State.Dead;
 
+
+
 			OnDie ();
 		}
 
 
 		void OnTriggerEnter2D (Collider2D other)
 		{
-
 			if (_state == State.Dead) {
 				return;
 			}
 
 			switch (other.tag) {
-				case "Enemy":
+				case GrindMeTags.Enemy:
+					SoundManager2.PlayHitSound();
 					Die (other.gameObject);
 					break;
-				case"Jumper":
-					_slowDownJump.Jump ();
+				case GrindMeTags.Jumper:
+					SoundManager2.PlayBoing();
+					var ramp = other.GetComponent<Ramp>();
+					ramp.DestroyShape();
+					_slowDownJump.Jump(speed, ramp.velX, ramp.velY, ramp.gravityScale);
 					break;
 			}
 
@@ -235,17 +346,14 @@ namespace TabTale
 		{
 			switch (_state) {
 				case State.Jumping:
-					if (coll.gameObject.tag == "Platform" || coll.gameObject.tag == "Enemy")
-						_slowDownJump.Land (coll);
+					if (coll.gameObject.tag == GrindMeTags.Platform){
+						_slowDownJump.Land (coll, !_isInDanger);
+					}else if (coll.gameObject.tag == GrindMeTags.Enemy){
+						_slowDownJump.Land(coll);
+					}
 					break;
 			}
 
 		}
-
-		public void OnNoEnemies ()
-		{
-			_slowDownJump.TriggerSlowdown (1f);
-		}
-
 	}
 }

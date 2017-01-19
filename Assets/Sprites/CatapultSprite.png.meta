@@ -26,7 +26,7 @@ TextureImporter:
   cubemapConvolutionSteps: 8
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
-  textureFormat: -1
+  textureFormat: -3
   maxTextureSize: 1024
   textureSettings:
     filterMode: -1
@@ -49,8 +49,10 @@ TextureImporter:
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: CatapultSprite_0
+    - serializedVersion: 2
+      name: CatapultSprite_0
       rect:
         serializedVersion: 2
         x: 111
@@ -60,16 +62,9 @@ TextureImporter:
       alignment: 9
       pivot: {x: 0.2981282, y: 0.8753225}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: 13.373001, y: 24.312103}
-        - {x: -8.626999, y: 24.312103}
-        - {x: -11.626999, y: 22.312103}
-        - {x: -11.626999, y: -114.6879}
-        - {x: -8.626999, y: -170.6879}
-        - {x: 27.373001, y: -170.6879}
-        - {x: 27.373001, y: -102.6879}
-        - {x: 21.373001, y: 9.312103}
-    - name: CatapultSprite_1
+      outline: []
+    - serializedVersion: 2
+      name: CatapultSprite_1
       rect:
         serializedVersion: 2
         x: 63
@@ -79,14 +74,7 @@ TextureImporter:
       alignment: 9
       pivot: {x: 0.20523627, y: 0.74426126}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -9.851341, y: 29.665695}
-        - {x: -9.851341, y: -27.334305}
-        - {x: -3.8513412, y: -55.334305}
-        - {x: 27.148659, y: -86.334305}
-        - {x: 38.14866, y: -86.334305}
-        - {x: 38.14866, y: -44.334305}
-        - {x: 22.148659, y: 29.665695}
+      outline: []
     outline: []
   spritePackingTag: 
   userData: 

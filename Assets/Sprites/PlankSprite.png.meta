@@ -25,7 +25,7 @@ TextureImporter:
   cubemapConvolutionSteps: 8
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
-  textureFormat: -1
+  textureFormat: -3
   maxTextureSize: 1024
   textureSettings:
     filterMode: -1
@@ -48,8 +48,10 @@ TextureImporter:
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: PlankSprite_0
+    - serializedVersion: 2
+      name: PlankSprite_0
       rect:
         serializedVersion: 2
         x: 47
@@ -59,12 +61,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -83, y: 20}
-        - {x: -83, y: -18}
-        - {x: -80, y: -20}
-        - {x: 83, y: -20}
-        - {x: 83, y: 20}
+      outline: []
     outline: []
   spritePackingTag: 
   userData: 

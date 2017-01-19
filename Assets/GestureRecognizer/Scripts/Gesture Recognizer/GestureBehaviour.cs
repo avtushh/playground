@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using System.Collections;
 using System.Threading;
+using System.Text;
 
 
 namespace GestureRecognizer
@@ -267,6 +268,8 @@ namespace GestureRecognizer
             }
         }
 
+		bool isRecognizing;
+		DateTime startRecognizeTime;
 
 		/// <summary>
 		/// Recognize the specified gesture.
@@ -276,46 +279,52 @@ namespace GestureRecognizer
         {
             if (points.Count > 2)
             {
-				StartCoroutine(RecognizeCoro());
+				libraryOutput = new StringBuilder();
+				isRecognizing = true;
+				startRecognizeTime = DateTime.Now;
 				thread = new Thread(Run);
 				thread.Start();
 
             }
-
         }
+
+		void Update(){
+			if (isRecognizing){
+				if (isRecognized){
+					isRecognizing = false;
+					var timeToRecognize = DateTime.Now - startRecognizeTime;
+
+					Debug.LogWarning(libraryOutput.ToString());
+					Debug.LogWarning(timeToRecognize.TotalMilliseconds.ToString("0.00"));
+
+					if (shapesToFind != null && shapesToFind.Count > 0)
+						OnGesturesRecognition(currentGesture, recognizedShapes);
+					else
+						OnGestureRecognition(currentGesture, recognizedShapes[0]);
+				}
+			}
+		}
 
 		List<Result> recognizedShapes;
 
 		Gesture currentGesture;
 
+		public StringBuilder libraryOutput = new StringBuilder();
+
 		void Run(){
 			currentGesture = CreateGesture();
 			if (shapesToFind != null && shapesToFind.Count > 0){
-				recognizedShapes = library.RecognizeAll(currentGesture, shapesToFind);
+				recognizedShapes = library.RecognizeAll(currentGesture, shapesToFind, libraryOutput);
 				isRecognized = true;
-
 
 			}else{
 				Result result = library.Recognize(gesture);
 				recognizedShapes.Add(result);
 				isRecognized = true;
-
 			}
 		}
 
-		//this is a coroutine which manages when columns are spawned
-		IEnumerator RecognizeCoro(){
-			
-			while (!isRecognized){
-				yield return null;	
-			}
 
-			if (shapesToFind != null && shapesToFind.Count > 0)
-				OnGesturesRecognition(currentGesture, recognizedShapes);
-			else
-				OnGestureRecognition(currentGesture, recognizedShapes[0]);
-
-		}
 
 
         /// <summary>
