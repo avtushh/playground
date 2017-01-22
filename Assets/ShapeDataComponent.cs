@@ -19,11 +19,10 @@ namespace TabTale
 		}
 
 		public void Activate(){
-			if (holder.GetComponent<Grinder> () != null){
-				holder.GetComponent<Grinder> ().Kill();
-			}else if (holder.GetComponent<Ramp>() != null){
-				holder.GetComponent<Ramp> ().Kill();
+			if (GetComponentInParent<ShapeHolder>() != null){
+				GetComponentInParent<ShapeHolder>().Kill();
 			}
+		
 		}
 	}
 }

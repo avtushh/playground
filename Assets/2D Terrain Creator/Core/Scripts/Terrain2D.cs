@@ -66,6 +66,33 @@ public abstract partial class Terrain2D : MonoBehaviour
         return point;
     }
 
+	public Vector3 GetCurveRightmostPoint(int index)
+	{
+		Vector3 point = GetPoint(index, 0f);
+
+		for (int i = 0; i < GetCurveSegments(index); i++)
+		{
+			Vector3 segmentEnd = GetPoint(index, i / (float)GetCurveSegments(index));
+
+			if (segmentEnd.x > point.x) point = segmentEnd;
+		}
+
+		return point;     
+	}
+
+	public Vector3 GetRightmostPoint()
+	{
+		Vector3 point = GetCurveRightmostPoint(0).x > 0f ? Vector3.zero : GetCurveRightmostPoint(0);
+
+		for (int i = 0; i < CurveCount * 3; i += 3)
+		{
+			if (GetCurveRightmostPoint(i).x > point.x) point = GetCurveRightmostPoint(i);
+		}
+
+		return point;
+	}
+
+
 
     public int CurveCount
     {

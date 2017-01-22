@@ -13,11 +13,10 @@ public class GRTileManager : MonoBehaviour {
 
 	public Transform cameraSpawnPoint;
 
-	EditableTerrain2D terrain2D;
-
 	Vector3 maxPoint;
 
-	// Use this for initialization
+	int tilesSinceFirst = 0;
+
 	void Start () {
 		UpdatePoints ();
 	}
@@ -26,26 +25,59 @@ public class GRTileManager : MonoBehaviour {
 		
 		if (maxPoint.x < cameraSpawnPoint.position.x){
 
-			tileGo = GameObject.Instantiate(GetRandomPrefab(), maxPoint, Quaternion.identity) as GameObject;
+			CreateNewTile ();
 
-			tileGo.transform.SetParent(transform);
-			UpdatePoints();
 		}
+	}
+
+	void CreateNewTile ()
+	{
+		var randomPrefab = GetRandomPrefab ();
+
+
+		tileGo = GameObject.Instantiate (randomPrefab, maxPoint, Quaternion.identity) as GameObject;
+		tileGo.transform.SetParent (transform);
+		UpdatePoints ();
 	}
 
 	void UpdatePoints ()
 	{
 		var terrains = tileGo.GetComponentsInChildren<EditableTerrain2D> ();
 
-		terrain2D = terrains[0];
-		maxPoint = tileGo.transform.position + terrain2D.GetControlPoint (terrain2D.controlPoints.Count - 1);
-		print(maxPoint);
+		maxPoint = GetRightmostControlPoint(terrains);
 		terrains.ToList().ForEach(x => {
 			x.UpdateAllChunkMeshes();
 		});
 	}
 
+	Vector3 GetRightmostControlPoint(Terrain2D[] array){
+		Vector3 maxPoint = Vector3.zero;
+
+		for (int i = 0; i < array.Length; i++) {
+			var terrain2D = array[i];
+			//var rightPoint = terrain2D.GetControlPoint (terrain2D.controlPoints.Count - 1);
+			var rightPoint = terrain2D.transform.position + terrain2D.GetRightmostPoint();
+			if (rightPoint.x > maxPoint.x){
+				maxPoint = rightPoint;
+			}
+		}
+
+		return maxPoint;
+	}
+
 	GameObject GetRandomPrefab(){
-		return tilesPrefab[Random.Range(0, tilesPrefab.Count)];
+
+		int randomIndex = Random.Range(0, tilesPrefab.Count);
+
+		if (randomIndex != 0){
+			tilesSinceFirst++;
+			if (tilesSinceFirst == 3){
+				randomIndex = 0;
+			}
+		}else{
+			tilesSinceFirst = 0;
+		}
+
+		return tilesPrefab[randomIndex];
 	}
 }

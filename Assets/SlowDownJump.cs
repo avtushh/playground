@@ -65,9 +65,7 @@ namespace TabTale
 			_rigidBody.velocity = new Vector2 (0, 0);
 			TriggerSlowdown (1);
 		}
-
-		float lastScale = 1f;
-
+			
 		public void TriggerSlowdown (float scale)
 		{
 //			_rigidBody.gravityScale /= (lastScale*lastScale);
@@ -76,8 +74,10 @@ namespace TabTale
 //			_rigidBody.gravityScale *= (scale*scale);
 //			_rigidBody.velocity *= scale;
 //			lastScale = scale;
-
+			if (targetScale != scale)
+				Debug.LogWarning("trigger slow down: " + scale);
 			targetScale = scale;
+
 		}
 
 		float currVel;

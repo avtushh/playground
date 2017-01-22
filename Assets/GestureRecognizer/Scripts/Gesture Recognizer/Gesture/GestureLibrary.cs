@@ -65,7 +65,7 @@ namespace GestureRecognizer
 				result.OriginalScore = distance;
 
 				#if UNITY_EDITOR
-				float minScore = 4f;
+				float minScore = 4.5f;
 				#else
 				float minScore = 3f;
 				#endif

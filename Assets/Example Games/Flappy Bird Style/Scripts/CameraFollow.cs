@@ -31,6 +31,8 @@ namespace TabTale
 		float orgZoom;
 		float targetZoom;
 
+		SRPlayer player;
+
 		void Start ()
 		{
 			topTransform = bottomTransform = target;
@@ -41,6 +43,10 @@ namespace TabTale
 
 			orgZoom = cam.orthographicSize;
 			targetZoom = cam.orthographicSize;
+
+			if (target.GetComponent<SRPlayer>() != null){
+				player = target.GetComponent<SRPlayer>();
+			}
 		}
 
 		void Grinder_OnDestroyEvent (GameObject obj)
@@ -52,6 +58,18 @@ namespace TabTale
 		{
 			var x = followHorizontal ? target.position.x + xOffset : transform.position.x;
 			//var y = followVertical ? target.position.y + yOffset : transform.position.y;
+
+			List<Transform> elementsToRemove = new List<Transform>();
+
+			elementsInView.ForEach(e => {
+				if (e != null && e.position.x < target.position.x){
+					elementsToRemove.Add(e);
+				}	
+			});
+
+			elementsToRemove.ForEach(e => {
+				elementsInView.Remove(e);
+			});
 
 			UpdateTargetY ();
 
@@ -122,14 +140,14 @@ namespace TabTale
 
 		void OnTriggerEnter2D (Collider2D other)
 		{
-			if (other.tag == GrindMeTags.Enemy || other.tag == GrindMeTags.Player || other.tag == GrindMeTags.Jumper) {
+			if (other.tag == GrindMeTags.Enemy || other.tag == GrindMeTags.Jumper) {
 				elementsInView.Add (other.transform);
 			}
 		}
 
 		void OnTriggerExit2D (Collider2D other)
 		{
-			if (other.tag == GrindMeTags.Enemy|| other.tag == GrindMeTags.Jumper) {
+			if (other.tag == GrindMeTags.Enemy || other.tag == GrindMeTags.Jumper) {
 				elementsInView.Remove (other.transform);
 			}
 		}
@@ -146,7 +164,18 @@ namespace TabTale
 					bottomTransform = x;
 				}
 			});
+				
+			if (topTransform != target && bottomTransform != target){
+				topTransform = target;
+				bottomTransform = target;
+			}
 
+			if (target != topTransform){
+				if (Vector3.Distance(target.position, topTransform.position) > 5){
+					topTransform = target;
+				}
+			}
+				
 			if (topTransform == target && bottomTransform == target){
 				targetY = target.position.y + yOffset;
 			}else

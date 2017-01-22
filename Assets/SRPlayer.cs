@@ -38,8 +38,6 @@ namespace TabTale
 
 		List<Transform> shapes = new List<Transform>();
 
-		int numVisibleEnemies;
-
 		public enum State
 		{
 			Idle,
@@ -104,10 +102,8 @@ namespace TabTale
 			if (obj.tag == GrindMeTags.Shape) {
 				if (isVisible) {
 					shapes.Add(obj.transform);
-					numVisibleEnemies++;
 				} else {
 					shapes.Remove(obj.transform);
-					numVisibleEnemies--;
 				}
 			}else if (obj.tag == GrindMeTags.Jumper){
 				hasJumper = isVisible;
@@ -148,23 +144,26 @@ namespace TabTale
 			ClosestShape closestEnemy = null;
 			float minDistance = Mathf.Infinity;
 
-			shapes.ForEach(x => {
+			shapes.ForEach(shape => {
 
-				if (x.position.x > transform.position.x - 1){
-					var dist = Vector3.Distance(x.position, transform.position);
+				if (shape != null && shape.transform.position.x > transform.position.x - 3){
 
-					if (dist < minDistance)	{
+					//if (shape.transform.position.y <= transform.position.y && _rigidBody.velocity.y <= 0 || shape.transform.position.y > transform.position.y && _rigidBody.velocity.y > 0){
+						var dist = Vector3.Distance(shape.transform.position, transform.position);
 
-						var shapeData = x.GetComponent<ShapeDataComponent>();
+						if (dist < minDistance)	{
 
-						if (shapeName == null || shapeData.Type == shapeName){
-							if (closestEnemy == null){
-								closestEnemy = new ClosestShape();
+							var shapeData = shape.GetComponentInChildren<ShapeDataComponent>();
+
+							if (shapeName == null || shapeData.Type == shapeName){
+								if (closestEnemy == null){
+									closestEnemy = new ClosestShape();
+								}
+								closestEnemy.shapeData = shapeData;
+								minDistance = dist;
 							}
-							closestEnemy.shapeData = shapeData;
-							minDistance = dist;
-						}
-					}
+						}	
+					//}
 				}
 			});
 
@@ -179,7 +178,7 @@ namespace TabTale
 		public float closetsEnemyDistance;
 
 		void CheckSlowDown(){
-			if (numVisibleEnemies > 0) {
+			if (shapes.Count > 0) {
 
 				var closetsEnemy = GetClosestEnemy();
 				if (closetsEnemy != null){
@@ -213,7 +212,11 @@ namespace TabTale
 
 		float GetSlowDownScale (ClosestShape closestEnemy)
 		{
-			if (closestEnemy.distance < 6){
+			if(closestEnemy.grinderGroup == null){ // not a grinder, a ramp or a crate
+				return 0.4f;
+			}
+
+			if (closestEnemy.distance < 5){
 				return 0.15f;
 			}
 			var slowScale = 0.2f;
@@ -329,6 +332,9 @@ namespace TabTale
 
 			switch (other.tag) {
 				case GrindMeTags.Enemy:
+					if (!other.GetComponentInParent<Grinder>().isAlive)
+						return;
+
 					SoundManager2.PlayHitSound();
 					Die (other.gameObject);
 					break;
@@ -349,7 +355,8 @@ namespace TabTale
 					if (coll.gameObject.tag == GrindMeTags.Platform){
 						_slowDownJump.Land (coll, !_isInDanger);
 					}else if (coll.gameObject.tag == GrindMeTags.Enemy){
-						_slowDownJump.Land(coll);
+						if (coll.gameObject.GetComponentInParent<ShapeHolder>().isAlive)
+							_slowDownJump.Land(coll);
 					}
 					break;
 			}
