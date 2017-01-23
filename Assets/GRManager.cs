@@ -17,9 +17,18 @@ namespace TabTale
 
 		public List<ShapeDataComponent> visibleShapes;
 
+		public Text txtScore;
+		public int score;
+
+		void UpdateScore ()
+		{
+			txtScore.text = score.ToString();
+		}
 
 		void Start ()
 		{
+			score = 0;
+			UpdateScore ();
 			AddListeners ();
 
 			StartCoroutine (CheckObstaclesForGesturesCoro ());
@@ -74,7 +83,10 @@ namespace TabTale
 
 		void Player_OnDanger ()
 		{
-			gestureBehaviour.gameObject.SetActive (true);
+			if (!gestureBehaviour.gameObject.activeInHierarchy){
+				gestureBehaviour.gameObject.SetActive (true);
+				SoundManager2.PlayDangerSound();	
+			}
 		}
 
 
@@ -121,6 +133,8 @@ namespace TabTale
 			if (enemy != null){
 				Debug.LogWarning("******* WANT TO DESTROY shape: " + name + " ,found shape: " + enemy.shapeData.Type);
 				enemy.shapeData.Activate();
+				score++;
+				UpdateScore();
 				return true;
 			}
 

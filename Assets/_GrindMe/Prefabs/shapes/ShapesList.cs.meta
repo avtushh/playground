@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 946aa5b51a62f4691ba0ed65c136d68b
-timeCreated: 1484818901
+timeCreated: 1485159528
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
@@ -11,6 +11,7 @@ MonoImporter:
   - triangle: {fileID: 124312, guid: 7f27890801a9b4a0594c42966d7d35ea, type: 2}
   - alpha: {fileID: 183042, guid: 677784c37b7884463ba19210c8cb8e5f, type: 2}
   - line: {fileID: 111526, guid: 25d3384bd0f834b51b6d7bf12ff08f0b, type: 2}
+  - vline: {fileID: 168858, guid: acc1b592986f14ba78caeeb2e75157ab, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

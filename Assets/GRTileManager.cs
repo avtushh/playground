@@ -7,7 +7,7 @@ public class GRTileManager : MonoBehaviour {
 
 	public List<GameObject> tilesPrefab;
 
-	public GameObject tileGo;
+	GameObject tileGo;
 
 	public Transform playerTransform;
 
@@ -18,6 +18,7 @@ public class GRTileManager : MonoBehaviour {
 	int tilesSinceFirst = 0;
 
 	void Start () {
+		tileGo = transform.GetChild(0).gameObject;
 		UpdatePoints ();
 	}
 

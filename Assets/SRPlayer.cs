@@ -38,6 +38,10 @@ namespace TabTale
 
 		List<Transform> shapes = new List<Transform>();
 
+		public LayerMask collisionMask;
+
+		Collider2D fieldOfViewCollider;
+
 		public enum State
 		{
 			Idle,
@@ -60,6 +64,7 @@ namespace TabTale
 		{
 			_rigidBody = GetComponent<Rigidbody2D> ();
 			_slowDownJump = GetComponent<SlowDownJump> ();
+			fieldOfViewCollider = GetComponentInChildren<FieldOfView>().GetComponent<Collider2D>();
 
 			sprRenderer.sprite = sprNormal;
 		}
@@ -70,7 +75,9 @@ namespace TabTale
 			_slowDownJump.JumpEvent += OnJumpEvent;
 			_slowDownJump.LandEvent += OnLandEvent;
 
-			CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
+			//CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
+
+			FieldOfView.OnCollision += CameraViewListener_onVisibilityChange;
 
 			_state = State.Idle;
 			trailParticles.SetActive (false);
@@ -87,14 +94,15 @@ namespace TabTale
 			OnStartSlide ();
 		}
 
-
+		public string layerMaskName;
 
 		void OnDestroy ()
 		{
 			_slowDownJump.JumpEvent -= OnJumpEvent;
 			_slowDownJump.LandEvent -= OnLandEvent;
 
-			CameraViewListener.onVisibilityChange -= CameraViewListener_onVisibilityChange;
+			//CameraViewListener.onVisibilityChange -= CameraViewListener_onVisibilityChange;
+			FieldOfView.OnCollision += CameraViewListener_onVisibilityChange;
 		}
 
 		void CameraViewListener_onVisibilityChange (bool isVisible, GameObject obj)
@@ -121,13 +129,14 @@ namespace TabTale
 					}
 					break;
 				case State.Sliding:
-				
+					
 					KeepMinXSpeed ();
 					BalanceRotation ();
 					if (!hasJumper)
 						CheckSlowDown();
 					break;
 				case State.Jumping:
+
 					CheckSlowDown();
 					break;
 			}
@@ -139,6 +148,56 @@ namespace TabTale
 			public GrinderGroup grinderGroup;
 		}
 
+		ClosestShape cs;
+
+		ClosestShape DetectThings(string shapeName = null)
+		{
+			ClosestShape closestEnemy = null;
+			float minDistance = Mathf.Infinity;
+
+			RaycastHit2D hit;
+
+			var startingAngle = -30f;
+			var endAngle = -180;
+			var numRays = 16;
+			var angleStep = Mathf.Abs(endAngle - startingAngle) / numRays;
+
+			var pos = transform.position;
+			for(var i = 0; i < numRays; i++)
+			{
+				var dir = Vector2.up * 0.2f;
+				dir = Quaternion.AngleAxis(startingAngle - i * angleStep, Vector3.forward) * Vector2.up;
+
+				var rayOrigin = new Vector2(pos.x, pos.y);
+				var rayLength = 7;
+				hit = Physics2D.Raycast(rayOrigin, dir, rayLength, collisionMask);
+				Debug.DrawRay(rayOrigin, dir * rayLength, Color.red);
+				Debug.DrawLine(rayOrigin, hit.point, Color.blue);
+				if(hit.collider != null)
+				{
+					
+					if (hit.distance < minDistance)	{
+
+						var shapeData = hit.collider.GetComponentInChildren<ShapeDataComponent>();
+
+						if (shapeName == null || shapeData.Type == shapeName){
+							if (closestEnemy == null){
+								closestEnemy = new ClosestShape();
+							}
+							closestEnemy.shapeData = shapeData;
+							minDistance = hit.distance;
+						}
+					}	
+				}
+			}
+
+			if (closestEnemy != null){
+				closestEnemy.distance = minDistance;
+			}
+
+			return closestEnemy;
+		}
+
 		public ClosestShape GetClosestEnemy(string shapeName = null){
 
 			ClosestShape closestEnemy = null;
@@ -146,7 +205,7 @@ namespace TabTale
 
 			shapes.ForEach(shape => {
 
-				if (shape != null && shape.transform.position.x > transform.position.x - 3){
+				if (shape != null){
 
 					//if (shape.transform.position.y <= transform.position.y && _rigidBody.velocity.y <= 0 || shape.transform.position.y > transform.position.y && _rigidBody.velocity.y > 0){
 						var dist = Vector3.Distance(shape.transform.position, transform.position);
@@ -178,9 +237,8 @@ namespace TabTale
 		public float closetsEnemyDistance;
 
 		void CheckSlowDown(){
-			if (shapes.Count > 0) {
-
-				var closetsEnemy = GetClosestEnemy();
+			
+			var closetsEnemy = GetClosestEnemy();
 				if (closetsEnemy != null){
 					closetsEnemyDistance = closetsEnemy.distance;
 
@@ -199,7 +257,6 @@ namespace TabTale
 						TriggerSlowDownMode (1f);
 						_isInDanger = false;
 					}
-				}
 			}else{
 				if (Time.timeScale < 1){
 					TriggerSlowDownMode(1f);
@@ -212,18 +269,25 @@ namespace TabTale
 
 		float GetSlowDownScale (ClosestShape closestEnemy)
 		{
-			if(closestEnemy.grinderGroup == null){ // not a grinder, a ramp or a crate
+			if(closestEnemy.shapeData.GetComponentInParent<GrinderGroup>() == null){ // not a grinder, a ramp or a crate
 				return 0.4f;
 			}
 
+			bool simpleGuestureEnemy = false;
+
+			if (ShapesList.IsSimpleShape(closestEnemy.shapeData.shape)){
+				simpleGuestureEnemy = true;
+			}
+
 			if (closestEnemy.distance < 5){
-				return 0.15f;
+				print(closestEnemy.distance);
+				return simpleGuestureEnemy?0.2f:0.15f;
 			}
 			var slowScale = 0.2f;
 			if (_state == State.Sliding) {
 				
-				if (closestEnemy.grinderGroup != null && closestEnemy.grinderGroup.forcedShape == Shape.line) {
-					slowScale = 0.7f;
+				if (simpleGuestureEnemy) {
+					slowScale = 0.4f;
 				}
 				else {
 					slowScale = 0.2f;
@@ -300,7 +364,10 @@ namespace TabTale
 
 		void Die (GameObject other)
 		{
-			var grinder = other.gameObject.GetComponentInParent<Grinder> ();
+			if (CurrState == State.Dead)
+				return;
+			
+			SoundManager2.PlayHitSound();
 
 			_slowDownJump.ResetPhysics ();
 
@@ -309,6 +376,8 @@ namespace TabTale
 			_rigidBody.velocity = Vector2.zero;
 
 			trailParticles.SetActive (false);
+
+			var grinder = other.gameObject.GetComponentInParent<Grinder> ();
 
 			LeanTween.move (gameObject, other.transform.position, 0.1f).setEase (LeanTweenType.easeInOutSine).setOnComplete (() => {
 				grinder.OnKillPlayer ();
@@ -335,7 +404,7 @@ namespace TabTale
 					if (!other.GetComponentInParent<Grinder>().isAlive)
 						return;
 
-					SoundManager2.PlayHitSound();
+
 					Die (other.gameObject);
 					break;
 				case GrindMeTags.Jumper:

@@ -324,9 +324,6 @@ namespace GestureRecognizer
 			}
 		}
 
-
-
-
         /// <summary>
         /// Creates the gesture.
         /// </summary>

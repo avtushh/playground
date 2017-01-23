@@ -5,12 +5,23 @@ public class SoundManager2 : MonoBehaviour {
 
 	public static SoundManager2 Instance;
 
-	public AudioClip sfxBoing, sfxHit, sfxKill;
+	public AudioClip sfxBoing, sfxHit, sfxKill, sfxDanger;
+
+	public AudioSource bgAudioSource;
 
 
 	void Awake(){
-		Instance = this;
+
+		if (Instance != null){
+			Destroy(gameObject);
+		}else{
+			DontDestroyOnLoad(this);
+			Instance = this;
+			bgAudioSource.Play();
+		}
 	}
+
+
 
 	public static void PlayBoing(){
 		Instance.PlaySound(Instance.sfxBoing, 0.7f);
@@ -22,6 +33,10 @@ public class SoundManager2 : MonoBehaviour {
 
 	public static void PlayKillSound(){
 		Instance.PlaySound(Instance.sfxKill, 1f);
+	}
+
+	public static void PlayDangerSound(){
+		Instance.PlaySound(Instance.sfxDanger, 1f);
 	}
 
 	void PlaySound (AudioClip clip, float volume = 1.0f){

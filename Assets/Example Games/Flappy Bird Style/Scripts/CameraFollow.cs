@@ -54,7 +54,7 @@ namespace TabTale
 			elementsInView.Remove (gameObject.transform);
 		}
 
-		void Update ()
+		void LateUpdate ()
 		{
 			var x = followHorizontal ? target.position.x + xOffset : transform.position.x;
 			//var y = followVertical ? target.position.y + yOffset : transform.position.y;
@@ -177,7 +177,13 @@ namespace TabTale
 			}
 				
 			if (topTransform == target && bottomTransform == target){
-				targetY = target.position.y + yOffset;
+				if (player.CurrState == SRPlayer.State.Jumping){
+					targetY = target.position.y + yOffset-4;
+					print("jump!");
+				}else{
+					targetY = target.position.y + yOffset;
+				}
+
 			}else
 				targetY = (topTransform.position.y + bottomTransform.position.y) / 2;
 		}

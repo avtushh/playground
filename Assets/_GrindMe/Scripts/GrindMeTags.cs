@@ -11,6 +11,7 @@ namespace TabTale
 		public const string Shape = "Shape";
 		public const string Platform = "Platform";
 		public const string Player = "Player";
+		public const string road = "road";
 	
 	}
 }

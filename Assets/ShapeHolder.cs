@@ -18,6 +18,17 @@ namespace TabTale
 
 		ParticleSystemAutoDestroy particlesAutoDestroy;
 
+		public ShapesList shapesBank;
+
+		protected virtual void OnStart ()
+		{
+			if (shapesBank != null){
+				var shape = shapesBank.GetRandomShape();
+
+				LoadShapePrefab(shapesBank.prefabByNameDict[shape]);
+			}
+		}
+
 		void Start ()
 		{
 			viewListener = GetComponentInChildren<CameraViewListener> ();
@@ -37,7 +48,6 @@ namespace TabTale
 			Destroy(gameObject);
 		}
 
-		protected virtual void OnStart(){}
 
 		public void LoadShapePrefab (GameObject prefab)
 		{
