@@ -72,8 +72,9 @@ public class GRTileManager : MonoBehaviour {
 
 		if (randomIndex != 0){
 			tilesSinceFirst++;
-			if (tilesSinceFirst == 3){
+			if (tilesSinceFirst >= 3){
 				randomIndex = 0;
+				tilesSinceFirst = 0;
 			}
 		}else{
 			tilesSinceFirst = 0;

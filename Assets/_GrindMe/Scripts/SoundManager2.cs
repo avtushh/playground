@@ -36,7 +36,7 @@ public class SoundManager2 : MonoBehaviour {
 	}
 
 	public static void PlayDangerSound(){
-		Instance.PlaySound(Instance.sfxDanger, 1f);
+		Instance.PlaySound(Instance.sfxDanger, 0.7f);
 	}
 
 	void PlaySound (AudioClip clip, float volume = 1.0f){

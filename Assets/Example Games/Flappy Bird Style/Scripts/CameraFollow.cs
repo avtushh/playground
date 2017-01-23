@@ -26,7 +26,7 @@ namespace TabTale
 
 		float targetY;
 
-		Camera cam;
+		public Camera cam;
 
 		float orgZoom;
 		float targetZoom;
@@ -38,8 +38,6 @@ namespace TabTale
 			topTransform = bottomTransform = target;
 
 			CameraViewListener.OnDestroyEvent += Grinder_OnDestroyEvent;
-
-			cam = GetComponent<Camera> ();
 
 			orgZoom = cam.orthographicSize;
 			targetZoom = cam.orthographicSize;
@@ -56,7 +54,7 @@ namespace TabTale
 
 		void LateUpdate ()
 		{
-			var x = followHorizontal ? target.position.x + xOffset : transform.position.x;
+			var x = followHorizontal ? target.position.x + xOffset : cam.transform.position.x;
 			//var y = followVertical ? target.position.y + yOffset : transform.position.y;
 
 			List<Transform> elementsToRemove = new List<Transform>();
@@ -73,9 +71,9 @@ namespace TabTale
 
 			UpdateTargetY ();
 
-			var y1 = Mathf.SmoothDamp (transform.position.y, targetY, ref currVel, 0.2f);
+			var y1 = Mathf.SmoothDamp (cam.transform.position.y, targetY, ref currVel, 0.2f);
 
-			transform.position = new Vector3 (x, y1, transform.position.z);
+			cam.transform.position = new Vector3 (x, y1, cam.transform.position.z);
 
 			if (!zooming)
 				UpdateZoom();			
