@@ -42,6 +42,8 @@ namespace TabTale
 
 		Collider2D fieldOfViewCollider;
 
+		FieldOfView fov;
+
 		public enum State
 		{
 			Idle,
@@ -64,7 +66,8 @@ namespace TabTale
 		{
 			_rigidBody = GetComponent<Rigidbody2D> ();
 			_slowDownJump = GetComponent<SlowDownJump> ();
-			fieldOfViewCollider = GetComponentInChildren<FieldOfView>().GetComponent<Collider2D>();
+			fov = GetComponentInChildren<FieldOfView>();
+			fieldOfViewCollider = fov.GetComponent<Collider2D>();
 
 			sprRenderer.sprite = sprNormal;
 		}
@@ -77,7 +80,7 @@ namespace TabTale
 
 			//CameraViewListener.onVisibilityChange += CameraViewListener_onVisibilityChange;
 
-			FieldOfView.OnCollision += CameraViewListener_onVisibilityChange;
+			fov.OnCollision += CameraViewListener_onVisibilityChange;
 
 			_state = State.Idle;
 			trailParticles.SetActive (false);
@@ -102,7 +105,7 @@ namespace TabTale
 			_slowDownJump.LandEvent -= OnLandEvent;
 
 			//CameraViewListener.onVisibilityChange -= CameraViewListener_onVisibilityChange;
-			FieldOfView.OnCollision += CameraViewListener_onVisibilityChange;
+			fov.OnCollision += CameraViewListener_onVisibilityChange;
 		}
 
 		void CameraViewListener_onVisibilityChange (bool isVisible, GameObject obj)

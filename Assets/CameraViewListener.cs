@@ -9,7 +9,6 @@ namespace TabTale
 	{
 
 		public static event Action<bool, GameObject> onVisibilityChange = (b,g) => {};
-		public static event Action<GameObject> OnDestroyEvent = (g) => {};
 
 		Bounds _bounds;
 
@@ -40,7 +39,6 @@ namespace TabTale
 		void OnDestroy ()
 		{
 			onVisibilityChange (false, gameObject);
-			OnDestroyEvent(gameObject);
 		}
 
 		public bool IsInCameraBounds (bool addSafetlyDelta = false)

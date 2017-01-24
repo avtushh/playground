@@ -37,8 +37,6 @@ namespace TabTale
 		{
 			topTransform = bottomTransform = target;
 
-			CameraViewListener.OnDestroyEvent += Grinder_OnDestroyEvent;
-
 			orgZoom = cam.orthographicSize;
 			targetZoom = cam.orthographicSize;
 
@@ -47,27 +45,15 @@ namespace TabTale
 			}
 		}
 
-		void Grinder_OnDestroyEvent (GameObject obj)
-		{
-			elementsInView.Remove (gameObject.transform);
-		}
-
 		void LateUpdate ()
 		{
+
+			if (player.CurrState == SRPlayer.State.Dead)
+				return;
 			var x = followHorizontal ? target.position.x + xOffset : cam.transform.position.x;
 			//var y = followVertical ? target.position.y + yOffset : transform.position.y;
 
-			List<Transform> elementsToRemove = new List<Transform>();
-
-			elementsInView.ForEach(e => {
-				if (e != null && e.position.x < target.position.x){
-					elementsToRemove.Add(e);
-				}	
-			});
-
-			elementsToRemove.ForEach(e => {
-				elementsInView.Remove(e);
-			});
+			RemovePassedEnemies ();
 
 			UpdateTargetY ();
 
@@ -77,6 +63,19 @@ namespace TabTale
 
 			if (!zooming)
 				UpdateZoom();			
+		}
+
+		void RemovePassedEnemies ()
+		{
+			List<Transform> elementsToRemove = new List<Transform> ();
+			elementsInView.ForEach (e =>  {
+				if (e != null && e.position.x < target.position.x) {
+					elementsToRemove.Add (e);
+				}
+			});
+			elementsToRemove.ForEach (e =>  {
+				elementsInView.Remove (e);
+			});
 		}
 
 		void SetZoom(float value){
@@ -131,10 +130,7 @@ namespace TabTale
 
 		}
 
-		void OnDestroy ()
-		{
-			CameraViewListener.OnDestroyEvent -= Grinder_OnDestroyEvent;
-		}
+
 
 		void OnTriggerEnter2D (Collider2D other)
 		{
@@ -175,9 +171,10 @@ namespace TabTale
 			}
 				
 			if (topTransform == target && bottomTransform == target){
+				//if (elementsInView.Count > 0)
+				//	elementsInView.Clear();
 				if (player.CurrState == SRPlayer.State.Jumping){
 					targetY = target.position.y + yOffset-4;
-					print("jump!");
 				}else{
 					targetY = target.position.y + yOffset;
 				}

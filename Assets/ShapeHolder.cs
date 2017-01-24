@@ -6,8 +6,6 @@ namespace TabTale
 {
 	public class ShapeHolder : MonoBehaviour{
 
-		public static event Action<GameObject> OnDestroyEvent = (g) => {};
-
 		public bool isAlive = false;
 
 		CameraViewListener viewListener;
@@ -87,13 +85,18 @@ namespace TabTale
 		}
 
 		protected virtual void OnKilled(){
-			OnDestroyEvent(gameObject);
 		}
 
 		public void DestroyShape(){
 			if (viewListener != null){
 				Destroy(viewListener.gameObject);
 			}	
+		}
+
+		void OnDestroy(){
+			if (particlesAutoDestroy != null){
+				particlesAutoDestroy.OnFinishedPlaying -= OnDestructionParticlesDone;
+			}
 		}
 
 	}

@@ -24,18 +24,22 @@ public class SoundManager2 : MonoBehaviour {
 
 
 	public static void PlayBoing(){
+		if (Instance == null)return;
 		Instance.PlaySound(Instance.sfxBoing, 0.7f);
 	}
 
 	public static void PlayHitSound(){
+		if (Instance == null)return;
 		Instance.PlaySound(Instance.sfxHit, 0.9f);
 	}
 
 	public static void PlayKillSound(){
+		if (Instance == null)return;
 		Instance.PlaySound(Instance.sfxKill, 1f);
 	}
 
 	public static void PlayDangerSound(){
+		if (Instance == null)return;
 		Instance.PlaySound(Instance.sfxDanger, 0.7f);
 	}
 
